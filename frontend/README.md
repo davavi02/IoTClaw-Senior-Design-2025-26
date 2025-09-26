@@ -148,42 +148,6 @@ frontend/
   - **`result.tsx`**: Game outcome and scoring
   - **`settings.tsx`**: User preferences and account settings
 
-#### **Assets (`assets/`)**
-- App icons for all platforms (iOS, Android, Web)
-- Splash screen graphics
-- Brand imagery and UI assets
-
-## 🛠️ Tech Stack
-
-- **Framework**: React Native (Expo)
-- **Navigation**: Expo Router (file-based)
-- **Language**: TypeScript
-- **Animation**: React Native Animated API
-- **State Management**: React Hooks
-- **Platform**: Cross-platform (iOS, Android, Web)
-
-### Dependencies
-
-#### **Core Framework**
-- `expo` ~54.0.8
-- `react` 19.1.0
-- `react-native` 0.81.4
-- `expo-router` ~6.0.7
-
-#### **Navigation**
-- `@react-navigation/native` ^7.1.8
-- `@react-navigation/bottom-tabs` ^7.4.0
-
-#### **UI & Animation**
-- `react-native-reanimated` ~4.1.0
-- `react-native-gesture-handler` ~2.28.0
-- `@expo/vector-icons` ^15.0.2
-
-#### **Development**
-- `typescript` ~5.9.2
-- `eslint` ^9.25.0
-- `@expo/cli` ^54.0.8
-
 ## 📱 Key Features Implemented
 
 ### **User Interface**
@@ -252,31 +216,9 @@ npx expo start --clear
 3. Delete node_modules and package-lock.json
 4. Run `npm install` fresh
 
-## 📄 Configuration
-
-### **Expo Configuration (`app.json`)**
-- App name and version settings
-- Platform-specific permissions  
-- Splash screen configuration
-- Navigation settings
-- Icon and asset mappings
-
-### **TypeScript Configuration**
-- Strict mode enabled
-- Path mapping for imports
-- React development support
-
 ## 🚦 Project Status
 
 This project is actively under development for the Senior Design 2025-26 academic year. Key features and UI components are implemented with ongoing IoT integration work.
-
-## 📞 Support
-
-For development issues:
-1. Check this README troubleshooting section
-2. Review Expo documentation: [docs.expo.dev](https://docs.expo.dev)
-3. Ensure all dependencies are installed correctly
-4. Verify mobile device/simulator compatibility
 
 ---
 
