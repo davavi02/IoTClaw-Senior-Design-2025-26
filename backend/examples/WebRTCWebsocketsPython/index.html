@@ -1,0 +1,57 @@
+<!--
+
+AI GENERATED CODE
+USED FOR PROOF OF CONCEPT, REFERENCE ONLY
+
+Simple HTML site served to users for interfacing with camera nodes
+Derrived from the webcam example of the aiortc GitHub repository
+
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Webcam Hub</title>
+    <style>
+    body { font-family: sans-serif; }
+    button { padding: 8px 16px; margin-top: 5px; }
+    video { width: 100%; background-color: #000; }
+    .option { margin-bottom: 8px; }
+    #media { max-width: 1280px; }
+    #controls { padding: 10px; border: 1px solid #ccc; border-radius: 5px; max-width: 400px; margin-bottom: 20px;}
+    label { display: block; margin-bottom: 5px; }
+    select { width: 100%; padding: 8px; }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <h2>Controls</h2>
+    <div class="option">
+        <label for="node-select">Select a Node:</label>
+        <select id="node-select">
+            <option value="" disabled selected>Loading nodes...</option>
+        </select>
+    </div>
+
+    <div class="option">
+        <input id="use-stun" type="checkbox"/>
+        <label for="use-stun">Use STUN server</label>
+    </div>
+
+    <button id="start" onclick="start()">Start</button>
+    <button id="stop" style="display: none" onclick="stop()">Stop</button>
+</div>
+
+<div id="media">
+    <h2>Media Stream</h2>
+    <video id="video" autoplay="true" playsinline="true"></video>
+</div>
+
+<audio id="audio" autoplay="true" style="display: none;"></audio>
+
+<script src="client.js"></script>
+</body>
+</html>
