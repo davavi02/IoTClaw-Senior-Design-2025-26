@@ -1,20 +1,16 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useAuthStore } from './stores/AuthStore';
+import LoginScreen from './components/LoginScreen';
+import HomeScreen from './components/HomeScreen';
 
 export default function App() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+    <>
+      {isAuthenticated ? <HomeScreen /> : <LoginScreen />}
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

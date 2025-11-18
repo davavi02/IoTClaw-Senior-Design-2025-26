@@ -7,13 +7,23 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "frontend",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.iotclaw.frontend",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["frontend"]
+          }
+        ],
+        "LSApplicationQueriesSchemes": ["googlechrome", "googlechromes"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +31,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.iotclaw.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
