@@ -9,11 +9,17 @@ import {
 
 const ShopScreen = () => {
 
-
   return (
     <Background>
       
       <View style={styles.shopHeader}>
+      </View>
+
+      <View style={styles.shopBannerContainer}>
+        <View style={styles.shopBanner}>
+          <Text style={styles.bannerText}>Token Shop</Text>
+        </View>
+
       </View>
       
       <View style={styles.shopContainer}>
@@ -40,17 +46,38 @@ const ShopScreen = () => {
 
 const styles = StyleSheet.create({
   shopContainer: {
-    flex: 5,
+    flex: 6,
     flexDirection: "row",
-    alignItems: "center"
+    alignSelf: "center",
+
   },
   shopHeader: {
     flex: 1,
+    backgroundColor: "#0B0028",
+  },
+  shopBannerContainer: {
+    padding: 10,
+  
+  },
+  shopBanner: {
+    width: 320,
+    height: 75,
+    backgroundColor: "#FF003C",
+    borderWidth: 8,
+    borderRadius: 20,
+    borderColor: "#FFFFFF",
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center"
+  },
+  bannerText: {
+    fontSize: 32,
+    color: "#FFFFFF"
   },
   shopItemCol: {
     flexDirection: "column",
     alignItems: "center",
-    width: "48%"
+    padding: 10,
   },
 });
 

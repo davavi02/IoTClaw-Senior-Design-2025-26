@@ -7,6 +7,7 @@ import ShopScreen from './components/ShopScreen';
 
 export default function App() {
   const { isAuthenticated } = useAuthStore();
+  {/* 
 
     return (
     <>
@@ -14,15 +15,15 @@ export default function App() {
       <StatusBar style="auto" />
     </>
   );
-
-  {/* 
-  return (
-  <>
-    <ShopScreen></ShopScreen>
-    <StatusBar style="auto" />
-  </>
-);
 */}
+
+  return (
+    <>
+      <ShopScreen></ShopScreen>
+      <StatusBar style="auto" />
+    </>
+
+);
 
 
 }
