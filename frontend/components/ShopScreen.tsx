@@ -1,18 +1,23 @@
 import React from 'react';
 import Background from './Background';
 import ShopButton from './ShopButton';
+import useUserDataStore from '../stores/UserDataStore';
 import {
   View,
   Text,
   StyleSheet,
+  Touchable,
 } from 'react-native';
 
 const ShopScreen = () => {
+
+  const { numTokens } = useUserDataStore();
 
   return (
     <Background>
       
       <View style={styles.shopHeader}>
+        <Text style={styles.tokenText}>Tokens: {numTokens}</Text>
       </View>
 
       <View style={styles.shopBannerContainer}>
@@ -49,15 +54,16 @@ const styles = StyleSheet.create({
     flex: 6,
     flexDirection: "row",
     alignSelf: "center",
-
   },
   shopHeader: {
     flex: 1,
+    flexDirection: "row",
     backgroundColor: "#0B0028",
+    borderBottomWidth: 3,
+    borderColor: "#FF003C",
   },
   shopBannerContainer: {
     padding: 10,
-  
   },
   shopBanner: {
     width: 320,
@@ -68,16 +74,20 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
     alignItems: "center",
     alignSelf: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   bannerText: {
     fontSize: 32,
-    color: "#FFFFFF"
+    color: "#FFFFFF",
   },
   shopItemCol: {
     flexDirection: "column",
     alignItems: "center",
     padding: 10,
+  },
+  tokenText: {
+    fontSize: 32,
+    color: "#FFFFFF",
   },
 });
 
