@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
 interface UserData {
-    username: string;
-    numTokens: number;
+  username: string;
+  numTokens: number;
 
-    setTokens: (num: number) => void;
+  setTokens: (num: number) => void;
 
 }
 
