@@ -1,11 +1,13 @@
 import React from 'react';
+import useUserDataStore from '../stores/UserDataStore';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  ImageSourcePropType
+  ImageSourcePropType,
+  GestureResponderEvent,
 } from 'react-native';
 
 interface ShopButtonProps {
@@ -16,8 +18,14 @@ interface ShopButtonProps {
 
 const ShopButton = ({numToken, price, img}: ShopButtonProps) => {
 
+  const { setTokens } = useUserDataStore();
+
+  const HandlePurchase = (evert: GestureResponderEvent) => {
+    setTokens(numToken);
+  };
+
   return (
-    <TouchableOpacity style={styles.shopItemContainer}>
+    <TouchableOpacity style={styles.shopItemContainer} onPressOut={HandlePurchase}>
       <View style={styles.mainButton}>
         <Text style={styles.tokenText}>{numToken}</Text>
         <Image source={img} style={styles.shopImg} resizeMode="contain"/>
