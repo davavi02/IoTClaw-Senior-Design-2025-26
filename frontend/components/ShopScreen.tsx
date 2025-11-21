@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     borderColor: "#FF003C",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
+    paddingHorizontal: 16,
   },
   shopBannerContainer: {
     padding: 10,
