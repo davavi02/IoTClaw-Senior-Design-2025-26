@@ -6,7 +6,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Touchable,
+  TouchableOpacity,
 } from 'react-native';
 
 const ShopScreen = () => {
@@ -17,7 +17,11 @@ const ShopScreen = () => {
     <Background>
       
       <View style={styles.shopHeader}>
+        <TouchableOpacity style={styles.backButton}>
+          <Text style={styles.backText}>{"< Back"}</Text>
+        </TouchableOpacity>
         <Text style={styles.tokenText}>Tokens: {numTokens}</Text>
+
       </View>
 
       <View style={styles.shopBannerContainer}>
@@ -61,6 +65,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#0B0028",
     borderBottomWidth: 3,
     borderColor: "#FF003C",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
   },
   shopBannerContainer: {
     padding: 10,
@@ -89,6 +96,20 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#FFFFFF",
   },
+  backText: {
+    fontSize: 24,
+    color: "#FFFFFF",
+    alignSelf: "center",
+  },
+  backButton: {
+    width: 100,
+    height: 50,
+    backgroundColor: "#FF003C",
+    borderWidth: 8,
+    borderRadius: 20,
+    borderColor: "#FFFFFF",
+    justifyContent: "center",
+  }
 });
 
 export default ShopScreen;
