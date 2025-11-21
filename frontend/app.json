@@ -13,16 +13,22 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "fonts": ["./assets/fonts/Jersey15-Regular.ttf"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.iotclaw.frontend",
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["frontend"]
+            "CFBundleURLSchemes": [
+              "frontend"
+            ]
           }
         ],
-        "LSApplicationQueriesSchemes": ["googlechrome", "googlechromes"]
+        "LSApplicationQueriesSchemes": [
+          "googlechrome",
+          "googlechromes"
+        ]
       }
     },
     "android": {
@@ -36,6 +42,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
