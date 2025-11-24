@@ -2,6 +2,7 @@ import React from 'react';
 import Background from './Background';
 import ShopButton from './ShopButton';
 import useUserDataStore from '../stores/UserDataStore';
+import { ShopProps } from './Routes';
 import {
   View,
   Text,
@@ -9,7 +10,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-const ShopScreen = () => {
+
+/// ======= 4: Add the props {route, navigation}: TYPE you exported in #3. Don't forget to import at top. 
+/// =======    Congrats for following my example in Routes.tsx, pat your self on the back.
+const ShopScreen = ({route, navigation}: ShopProps) => {
 
   const { numTokens } = useUserDataStore();
 
@@ -17,7 +21,7 @@ const ShopScreen = () => {
     <Background>
       
       <View style={styles.shopHeader}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.navigate('Login')}}>
           <Text style={styles.backText}>{"< Back"}</Text>
         </TouchableOpacity>
         <Text style={styles.tokenText}>Tokens: {numTokens}</Text>

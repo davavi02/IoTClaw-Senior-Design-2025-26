@@ -8,8 +8,9 @@ import {
   Alert,
 } from 'react-native';
 import { useAuthStore } from '../stores/AuthStore';
+import { LoginProps } from './Routes';
 
-const LoginScreen: React.FC = () => {
+const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   const { signIn, isLoading, error } = useAuthStore();
   const [debugInfo, setDebugInfo] = React.useState<string>('');
 

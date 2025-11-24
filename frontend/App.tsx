@@ -1,29 +1,20 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from './stores/AuthStore';
-import LoginScreen from './components/LoginScreen';
-import HomeScreen from './components/HomeScreen';
-import ShopScreen from './components/ShopScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import Routes from './components/Routes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   const { isAuthenticated } = useAuthStore();
-  {/* 
 
-    return (
-    <>
-      {isAuthenticated ? <HomeScreen /> : <LoginScreen />}
-      <StatusBar style="auto" />
-    </>
+  //Wanna add your screen goto components/routes.tsx
+  return(
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Routes/>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
-*/}
-
-  return (
-    <>
-      <ShopScreen></ShopScreen>
-      <StatusBar style="auto" />
-    </>
-
-);
-
-
 }
