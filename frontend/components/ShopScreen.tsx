@@ -21,7 +21,7 @@ const ShopScreen = ({route, navigation}: ShopProps) => {
     <Background>
       
       <View style={styles.shopHeader}>
-        <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.navigate('Login')}}>
+        <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.navigate('Home')}}>
           <Text style={styles.backText}>{"< Back"}</Text>
         </TouchableOpacity>
         <Text style={styles.tokenText}>Tokens: {numTokens}</Text>

@@ -8,8 +8,9 @@ import {
   Image,
 } from 'react-native';
 import { useAuthStore } from '../stores/AuthStore';
+import { HomeProps } from './Routes';
 
-const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { user, signOut } = useAuthStore();
 
   return (
@@ -32,6 +33,20 @@ const HomeScreen: React.FC = () => {
       <View style={styles.mainContent}>
         <Text style={styles.title}>IoT Claw Control</Text>
         <Text style={styles.subtitle}>Ready to play!</Text>
+
+        {/* Navigation Buttons */}
+        <View style={styles.controlSection}>
+          <Text style={styles.sectionTitle}>Navigation</Text>
+          <View style={styles.navigationGrid}>
+            <TouchableOpacity 
+              style={[styles.navButton, styles.navButtonPrimary]}
+              onPress={() => navigation.navigate('Shop')}
+            >
+              <Text style={[styles.navButtonText, styles.navButtonPrimaryText]}>🛒 Shop</Text>
+            </TouchableOpacity>
+            {/* Add more navigation buttons here as needed */}
+          </View>
+        </View>
 
         <View style={styles.controlSection}>
           <Text style={styles.sectionTitle}>Machine Status</Text>
@@ -227,6 +242,35 @@ const styles = StyleSheet.create({
   streamSubtext: {
     fontSize: 14,
     color: '#999',
+  },
+  navigationGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  navButton: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    minWidth: '47%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  navButtonPrimary: {
+    backgroundColor: '#4285F4',
+  },
+  navButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  navButtonPrimaryText: {
+    color: '#fff',
   },
 });
 

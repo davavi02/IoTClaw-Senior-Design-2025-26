@@ -21,7 +21,8 @@
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
-              "frontend"
+              "frontend",
+              "com.googleusercontent.apps.832482974548-cugsmg65capsk4hdmr4eeimuat6rb9le"
             ]
           }
         ],

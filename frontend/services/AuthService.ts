@@ -30,58 +30,60 @@ class AuthService {
   private redirectUri: string;
 
   constructor() {
-    // Note: Expo AuthSession uses web-based OAuth flow, so Web Client ID often works best
-    // However, we try platform-specific IDs first as they may be required for some configurations
-    const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || 
-      '832482974548-a1pf42oi4vpat8skut5isbbvcn16i7ja.apps.googleusercontent.com';
-    
+    // Using platform-specific iOS/Android OAuth clients for native app
+    // iOS OAuth client for iOS devices
+    // Android OAuth client for Android devices
     const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || 
       '832482974548-cugsmg65capsk4hdmr4eeimuat6rb9le.apps.googleusercontent.com';
     
     const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 
       '832482974548-611q2nuek1midi2hasi3m28ilp680ckj.apps.googleusercontent.com';
     
-    // Try platform-specific client IDs first
-    // If you encounter authorization errors, try using webClientId for all platforms
+    // Always use platform-specific client IDs for native app
     if (Platform.OS === 'ios') {
-      // For iOS, try iOS client ID first, but Web Client ID may work better with Expo
       this.clientId = iosClientId;
     } else if (Platform.OS === 'android') {
       this.clientId = androidClientId;
     } else {
-      // Web or other platforms use web client ID
-      this.clientId = webClientId;
+      // Fallback (shouldn't happen for native app, but just in case)
+      throw new Error('Unsupported platform. This app is designed for iOS and Android only.');
     }
     
-    // TEMPORARY FIX: Use Web Client ID on all platforms to avoid access issues
-    // Expo AuthSession uses web-based OAuth, so Web Client ID works best
-    // Uncomment the line below if you're having authorization errors:
-    this.clientId = webClientId;
-    
-    // For Google Cloud Console, we need HTTP/HTTPS redirect URIs
-    // Expo AuthSession can handle both custom schemes and HTTP URLs
-    // We'll use makeRedirectUri which generates the correct URI for the environment
-    const defaultRedirectUri = AuthSession.makeRedirectUri({
-      scheme: 'frontend',
-      path: 'redirect',
-    });
-    
-    // For development with Expo Go, the URI might be exp:// format
-    // But Google Cloud Console requires HTTP/HTTPS for Web application type
-    // So we'll use localhost HTTP URL for development
-    // IMPORTANT: Make sure this exact URI is in Google Cloud Console!
-    if (__DEV__) {
-      // Development: Use localhost HTTP URL (Google Cloud Console accepts this)
-      // This works because Expo AuthSession can intercept HTTP redirects in development
-      this.redirectUri = 'http://localhost:8081';
+    // Generate the redirect URI for iOS/Android OAuth clients
+    // For iOS: Use the iOS URL scheme format (com.googleusercontent.apps.CLIENT_ID:/)
+    // For Android: Use custom scheme (frontend://redirect)
+    // For Expo Go: Will use exp:// format which may need to be added to OAuth client
+    if (Platform.OS === 'ios') {
+      // For iOS OAuth clients, use the iOS URL scheme format
+      // Format: com.googleusercontent.apps.{CLIENT_ID_WITHOUT_SUFFIX}:/
+      // This matches the "iOS URL scheme" shown in Google Cloud Console
+      const clientIdWithoutSuffix = this.clientId.split('.apps.googleusercontent.com')[0];
+      this.redirectUri = `com.googleusercontent.apps.${clientIdWithoutSuffix}:/`;
     } else {
-      // Production: Use the generated redirect URI (custom scheme)
-      // For production, you may need to set up a custom domain with HTTP/HTTPS
-      this.redirectUri = defaultRedirectUri;
+      // For Android, use the custom scheme
+      // This will be frontend://redirect for standalone builds
+      // Or exp:// format for Expo Go
+      this.redirectUri = AuthSession.makeRedirectUri({
+        scheme: 'frontend',
+        path: 'redirect',
+      });
+      
+      // For Expo Go on Android, if it generates exp://, you may need to add it to Android OAuth client
+      // Or use a development build instead
+      if (__DEV__ && this.redirectUri.startsWith('exp://')) {
+        console.warn('Expo Go detected. You may need to add this exp:// redirect URI to your Android OAuth client, or use a development build.');
+      }
     }
     
     // Log the redirect URI for debugging
+    console.log('Platform:', Platform.OS);
+    console.log('Client ID:', this.clientId);
     console.log('Redirect URI configured:', this.redirectUri);
+    if (Platform.OS === 'ios') {
+      console.log('Note: iOS OAuth client uses iOS URL scheme - no redirect URI configuration needed in Google Cloud Console');
+    } else {
+      console.log('Note: For Android, ensure the redirect URI is configured in your Android OAuth client if needed');
+    }
   }
 
   async signInWithGoogle(): Promise<AuthResult> {
@@ -126,14 +128,34 @@ class AuthService {
 
         console.log('Exchanging code for token...');
         
-        // Exchange code for token
+        // Exchange code for token with PKCE support
+        // The code verifier should be stored in the request when usePKCE is true
+        // Try to access it from various possible property names
+        const codeVerifier = (request as any).codeVerifier || 
+                            (request as any)._codeVerifier || 
+                            (request as any).code_verifier;
+        
+        console.log('PKCE enabled:', request.usePKCE);
+        console.log('Code verifier found:', !!codeVerifier);
+        
+        if (!codeVerifier && request.usePKCE) {
+          console.error('PKCE code verifier not found! This will cause authentication to fail.');
+          console.log('Request object keys:', Object.keys(request));
+        }
+        
+        const exchangeParams: any = {
+          clientId: this.clientId,
+          code: code as string,
+          redirectUri: this.redirectUri,
+        };
+        
+        // Add code verifier if PKCE is enabled
+        if (codeVerifier) {
+          exchangeParams.extraParams = { code_verifier: codeVerifier };
+        }
+        
         const tokenResult = await AuthSession.exchangeCodeAsync(
-          {
-            clientId: this.clientId,
-            code: code as string,
-            redirectUri: this.redirectUri,
-            extraParams: {},
-          },
+          exchangeParams,
           discovery
         );
 

@@ -7,11 +7,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../stores/AuthStore';
 import { LoginProps } from './Routes';
 
 const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
-  const { signIn, isLoading, error } = useAuthStore();
+  const { signIn, isLoading, error, clearError } = useAuthStore();
   const [debugInfo, setDebugInfo] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -23,8 +24,24 @@ const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
     console.log('Auth Debug Info:', info);
   }, []);
 
+  // Reset error state when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Clear any errors when user navigates back to login screen
+      clearError();
+      console.log('Login screen focused - ready for sign-in');
+    }, [clearError])
+  );
+
   const handleGoogleSignIn = async () => {
-    await signIn();
+    // Clear any previous errors before signing in
+    clearError();
+    console.log('Sign-in button pressed');
+    try {
+      await signIn();
+    } catch (err) {
+      console.error('Sign-in error:', err);
+    }
   };
 
   React.useEffect(() => {
