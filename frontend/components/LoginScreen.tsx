@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
@@ -10,10 +11,15 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../stores/AuthStore';
 import { LoginProps } from './Routes';
+import Background from './Background';
 
 const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   const { signIn, isLoading, error, clearError } = useAuthStore();
   const [debugInfo, setDebugInfo] = React.useState<string>('');
+
+  const googleIconImage = require("../assets/GoogleIcon.png");
+  const clawzerTitle = require("../assets/ClawzerTitle.png");
+  const clawMachine = require("../assets/ClawMachine.png");
 
   React.useEffect(() => {
     // Log debug info on mount
@@ -57,91 +63,62 @@ const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   }, [error]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>IoT Claw</Text>
-        <Text style={styles.subtitle}>Sign in to control your claw machine</Text>
+    <Background>
+      <View style={styles.container}>
+        <Image source={clawzerTitle} style={styles.clawTitle}/>
+        <Image source={clawMachine} style={styles.clawMachine}/>
 
-        <TouchableOpacity
-          style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
-          onPress={handleGoogleSignIn}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <>
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} disabled={isLoading}>
+          {isLoading ? (<ActivityIndicator color="#fff" />) : 
+            (<View style={styles.googleButtonContainer}>
+              <Image source={googleIconImage} style={styles.googleIcon}/>
               <Text style={styles.googleButtonText}>Sign in with Google</Text>
-            </>
-          )}
+            </View>)
+          }
         </TouchableOpacity>
 
-        <Text style={styles.note}>
-          You'll need to configure your Google OAuth Client ID in the environment variables
-        </Text>
       </View>
-    </View>
+    </Background>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  content: {
-    width: '100%',
-    maxWidth: 400,
-    alignItems: 'center',
+  clawTitle: {
+    width: 360,
   },
-  title: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 40,
+  clawMachine: {
+    width: 400,
+    height: 400,
   },
   googleButton: {
-    backgroundColor: '#4285F4',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 50,
+    backgroundColor: '#222',
+    borderColor: '#00E5FF',
+    borderRadius: 16,
+    borderWidth: 4,
+    width: 360,
+    height: 80,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  googleButtonDisabled: {
-    opacity: 0.6,
   },
   googleButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 26,
     fontWeight: '600',
+    paddingLeft: 8,
   },
-  note: {
-    marginTop: 20,
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
-    fontStyle: 'italic',
+  googleButtonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+  googleIcon: {
+    width: 80,
+    height: 80,
+  }
 });
 
 export default LoginScreen;
