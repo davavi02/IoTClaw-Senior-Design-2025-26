@@ -35,6 +35,13 @@ const Routes = () => {
   useEffect(() => {
     const authStateChanged = prevAuthState.current !== isAuthenticated;
     
+    console.log('Routes: Auth state check', {
+      isAuthenticated,
+      prevAuthState: prevAuthState.current,
+      authStateChanged,
+      isNavigating: isNavigating.current,
+    });
+    
     // Only handle navigation when auth state changes (not on every render)
     if (authStateChanged && !isNavigating.current) {
       isNavigating.current = true;
@@ -42,19 +49,29 @@ const Routes = () => {
       if (isAuthenticated) {
         // User just logged in - navigate to Home (homepage)
         // Use reset to clear navigation stack and set Home as root
-        console.log('User authenticated - navigating to Home (homepage)');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' as never }],
-        });
+        console.log('✅ User authenticated - navigating to Home (homepage)');
+        try {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' as never }],
+          });
+          console.log('✅ Navigation to Home completed');
+        } catch (error) {
+          console.error('❌ Navigation error:', error);
+        }
       } else if (!isAuthenticated && prevAuthState.current === true) {
         // User just logged out - navigate to Login
         // Only reset if user was previously authenticated
-        console.log('User logged out - navigating to Login');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' as never }],
-        });
+        console.log('✅ User logged out - navigating to Login');
+        try {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' as never }],
+          });
+          console.log('✅ Navigation to Login completed');
+        } catch (error) {
+          console.error('❌ Navigation error:', error);
+        }
       }
       
       prevAuthState.current = isAuthenticated;

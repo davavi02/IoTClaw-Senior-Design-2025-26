@@ -32,7 +32,7 @@ class AuthService {
   constructor() {
     // Using platform-specific iOS/Android OAuth clients for native app
     // iOS OAuth client for iOS devices
-    // Android OAuth client for Android devices
+    // Android OAuth client for Android devices (supports custom URI schemes)
     const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS || 
       '832482974548-cugsmg65capsk4hdmr4eeimuat6rb9le.apps.googleusercontent.com';
     
@@ -43,6 +43,7 @@ class AuthService {
     if (Platform.OS === 'ios') {
       this.clientId = iosClientId;
     } else if (Platform.OS === 'android') {
+      // Use Android OAuth client (supports custom URI schemes with reverse client ID format)
       this.clientId = androidClientId;
     } else {
       // Fallback (shouldn't happen for native app, but just in case)
@@ -54,25 +55,25 @@ class AuthService {
     // For Android: Use custom scheme (frontend://redirect)
     // For Expo Go: Will use exp:// format which may need to be added to OAuth client
     if (Platform.OS === 'ios') {
-      // For iOS OAuth clients, use the iOS URL scheme format
-      // Format: com.googleusercontent.apps.{CLIENT_ID_WITHOUT_SUFFIX}:/
-      // This matches the "iOS URL scheme" shown in Google Cloud Console
+      // For iOS: Use reverse client ID format (this works for iOS)
       const clientIdWithoutSuffix = this.clientId.split('.apps.googleusercontent.com')[0];
       this.redirectUri = `com.googleusercontent.apps.${clientIdWithoutSuffix}:/`;
+      console.log('iOS: Using reverse client ID format for redirect URI');
     } else {
-      // For Android, use the custom scheme
-      // This will be frontend://redirect for standalone builds
-      // Or exp:// format for Expo Go
-      this.redirectUri = AuthSession.makeRedirectUri({
-        scheme: 'frontend',
-        path: 'redirect',
-      });
+      // For Android: Use reverse client ID format (same as iOS)
+      // Format: com.googleusercontent.apps.{CLIENT_ID_WITHOUT_SUFFIX}:/
+      // Android OAuth clients with custom URI scheme enabled automatically accept this
+      // No need to manually add redirect URI - Google validates based on package name and SHA-1
+      const clientIdWithoutSuffix = this.clientId.split('.apps.googleusercontent.com')[0];
+      this.redirectUri = `com.googleusercontent.apps.${clientIdWithoutSuffix}:/`;
       
-      // For Expo Go on Android, if it generates exp://, you may need to add it to Android OAuth client
-      // Or use a development build instead
-      if (__DEV__ && this.redirectUri.startsWith('exp://')) {
-        console.warn('Expo Go detected. You may need to add this exp:// redirect URI to your Android OAuth client, or use a development build.');
-      }
+      console.log('Android: Using reverse client ID format (same as iOS)');
+      console.log('  Client ID:', this.clientId);
+      console.log('  Redirect URI:', this.redirectUri);
+      console.log('  Package name: com.iotclaw.frontend (must match Google Cloud Console)');
+      console.log('  SHA-1: F4:05:B3:0B:88:62:3A:43:EB:3F:74:A9:2F:40:10:5E:B8:25:3A:7D (must match Google Cloud Console)');
+      console.log('  Custom URI scheme: Must be enabled in Android OAuth client');
+      console.log('  Note: Redirect URI is automatically validated - no need to add manually');
     }
     
     // Log the redirect URI for debugging
@@ -82,7 +83,10 @@ class AuthService {
     if (Platform.OS === 'ios') {
       console.log('Note: iOS OAuth client uses iOS URL scheme - no redirect URI configuration needed in Google Cloud Console');
     } else {
-      console.log('Note: For Android, ensure the redirect URI is configured in your Android OAuth client if needed');
+      console.log('Note: Android OAuth client validates redirect URI automatically based on package name and SHA-1');
+      console.log('   Package name: com.iotclaw.frontend (must match app.json)');
+      console.log('   SHA-1: F4:05:B3:0B:88:62:3A:43:EB:3F:74:A9:2F:40:10:5E:B8:25:3A:7D');
+      console.log('   Redirect URI:', this.redirectUri, '(must match scheme in app.json)');
     }
   }
 
@@ -100,16 +104,34 @@ class AuthService {
         usePKCE: true,
       });
 
+      console.log('Calling promptAsync - this will open browser for OAuth');
       const result = await request.promptAsync(discovery);
 
-      console.log('Auth result type:', result.type);
+      console.log('✅ promptAsync returned - Auth result type:', result.type);
+      console.log('Full result:', JSON.stringify(result, null, 2));
+      
+      if (result.type === 'success' || result.type === 'error') {
+        console.log('Auth result params:', (result as any).params);
+        console.log('Auth result error:', (result as any).error);
+      }
+      
+      // If result is dismiss, the redirect wasn't caught
+      if (result.type === 'dismiss') {
+        console.error('❌ OAuth dismissed - redirect URI not caught by app');
+        console.error('This means the app did not receive the redirect from Google');
+        console.error('Check that intent filter in app.json matches redirect URI scheme');
+        console.error('Redirect URI should be:', this.redirectUri);
+      }
 
       if (result.type === 'success') {
         const { code, error, error_description } = result.params;
         
+        console.log('✅ OAuth success - received code:', !!code);
+        console.log('Error in params:', error);
+        
         // Check for errors in the response
         if (error) {
-          console.error('OAuth error:', error, error_description);
+          console.error('❌ OAuth error in response:', error, error_description);
           return {
             accessToken: null,
             userInfo: null,
@@ -118,7 +140,8 @@ class AuthService {
         }
 
         if (!code) {
-          console.error('No authorization code received');
+          console.error('❌ No authorization code received');
+          console.log('Full params:', result.params);
           return {
             accessToken: null,
             userInfo: null,
@@ -194,11 +217,23 @@ class AuthService {
 
       if (result.type === 'error') {
         const errorMessage = result.error?.message || result.error?.code || 'Authentication error';
-        console.error('Auth error:', errorMessage);
+        console.error('❌ Auth error:', errorMessage);
+        console.error('Error details:', result.error);
         return {
           accessToken: null,
           userInfo: null,
           error: errorMessage,
+        };
+      }
+
+      if (result.type === 'dismiss') {
+        console.error('❌ Auth dismissed - redirect URI may not be handled correctly');
+        console.error('This usually means the app did not receive the redirect from Google');
+        console.error('Check that the intent filter in app.json matches the redirect URI');
+        return {
+          accessToken: null,
+          userInfo: null,
+          error: 'Authentication was dismissed. The redirect URI may not be configured correctly.',
         };
       }
 

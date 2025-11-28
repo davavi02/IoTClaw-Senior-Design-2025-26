@@ -26,6 +26,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const result = await AuthService.signInWithGoogle();
       
       if (result.accessToken && result.userInfo) {
+        console.log('✅ Sign-in successful - setting authenticated state');
+        console.log('User:', result.userInfo.email);
         set({
           isAuthenticated: true,
           user: result.userInfo,
@@ -33,7 +35,9 @@ export const useAuthStore = create<AuthState>((set) => ({
           isLoading: false,
           error: null,
         });
+        console.log('✅ Authentication state updated - should navigate to Home');
       } else {
+        console.error('❌ Sign-in failed:', result.error);
         set({
           isAuthenticated: false,
           user: null,
@@ -43,6 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
       }
     } catch (error) {
+      console.error('❌ Sign-in error:', error);
       set({
         isAuthenticated: false,
         user: null,
