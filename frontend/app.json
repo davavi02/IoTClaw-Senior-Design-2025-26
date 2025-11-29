@@ -4,7 +4,7 @@
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/claw_icon1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "frontend",
@@ -21,8 +21,7 @@
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
-              "frontend",
-              "com.googleusercontent.apps.832482974548-cugsmg65capsk4hdmr4eeimuat6rb9le"
+              "frontend"
             ]
           }
         ],
@@ -39,36 +38,13 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.iotclaw.frontend",
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": false,
-          "data": [
-            {
-              "scheme": "frontend"
-            }
-          ],
-          "category": ["BROWSABLE", "DEFAULT"]
-        },
-        {
-          "action": "VIEW",
-          "autoVerify": false,
-          "data": [
-            {
-              "scheme": "com.googleusercontent.apps.832482974548-611q2nuek1midi2hasi3m28ilp680ckj"
-            }
-          ],
-          "category": ["BROWSABLE", "DEFAULT"]
-        }
-      ]
+      "package": "com.iotclaw.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font",
-      "./app.plugin.js"
+      "expo-font"
     ]
   }
 }
