@@ -41,7 +41,7 @@ const ShopScreen = ({route, navigation}: ShopProps) => {
 
         <View style={styles.shopItemCol}>
           <ShopButton img={require("../assets/coin.png")} price="$1.99" numToken={100}/>
-          <ShopButton img={require("../assets/coin.png")} price="$9.99" numToken={1200}/>
+          <ShopButton img={require("../assets/coin.png")} price="$9.99" numToken={550}/>
           <ShopButton img={require("../assets/coin.png")} price="$39.99" numToken={5200}/>
         </View>
         

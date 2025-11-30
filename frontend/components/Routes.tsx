@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect, useRef } from 'react';
 import LoginScreen from './LoginScreen';
 import ShopScreen from './ShopScreen';
+import PrizeScreen from './PrizeScreen';
 import HomeScreen from './HomeScreen';
 import { useAuthStore } from '../stores/AuthStore';
 
@@ -10,14 +11,15 @@ import { useAuthStore } from '../stores/AuthStore';
 /// First: For each route add its param types to stackparamlist, if no params go undefined like I did.
 /// Second: Add the route to routes, emphasis on the name as its a id persay.
 /// Third: Make a type, so typescripts whiney ass stops complaining. Look at the bottom of this file. For ShopProps/LoginProps
-/// FOurth: Go to your compononet and add the params look at ShopScreen.tsx for a example..
+/// Fourth: Go to your compononet and add the params look at ShopScreen.tsx for a example..
 
 
 /// ======= 1: Make params, we shouldn't be passing crap so this should prob be empty...
 type StackParamList = {
-  Home: undefined;
+  Home: { from?: string };
   Shop: undefined;
-  Login: undefined;
+  Login: { from?: string };
+  Prize: { from?: string };
 };
 
 const Stack = createNativeStackNavigator<StackParamList, "Stack">();
@@ -85,18 +87,37 @@ const Routes = () => {
 
   return(
     <Stack.Navigator 
-      initialRouteName={isAuthenticated ? 'Home' : 'Login'} 
+//       initialRouteName={isAuthenticated ? 'Home' : 'Login'}
+      initialRouteName = "Home"
       id="Stack" 
       screenOptions={{headerShown: false}}
     >
-      <Stack.Screen name='Home' component={HomeScreen}></Stack.Screen>
+      <Stack.Screen
+        name='Home'
+        component={HomeScreen}
+        options={({ route }) => ({
+          animation:
+            route.params?.from === 'Prize' ? 'slide_from_right' :
+            route.params?.from === 'Shop' ? 'slide_from_bottom' :
+            route.params?.from === 'Profile' ? 'slide_from_left' :
+            'default',
+        })}
+      />
       <Stack.Screen name='Shop' component={ShopScreen}></Stack.Screen>
       <Stack.Screen name='Login' component={LoginScreen}></Stack.Screen>
+      <Stack.Screen
+        name='Prize'
+        component={PrizeScreen}
+        options={({ route }) => ({
+          animation: route.params?.from === 'Home' ? 'slide_from_left' : 'default',
+        })}
+      />
     </Stack.Navigator>);
 };
 
 /// ======= 3: Not Gonna lie just copy paste shop, change the type name, and the 'Shop' to the name in #2
 export type HomeProps = NativeStackScreenProps<StackParamList, 'Home', 'Stack'>;
+export type PrizeProps = NativeStackScreenProps<StackParamList, 'Prize', 'Stack'>;
 export type ShopProps = NativeStackScreenProps<StackParamList, 'Shop', 'Stack'>;
 export type LoginProps = NativeStackScreenProps<StackParamList, 'Login', 'Stack'>;
 

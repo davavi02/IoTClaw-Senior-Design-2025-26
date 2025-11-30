@@ -1,278 +1,194 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   Image,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import { useAuthStore } from '../stores/AuthStore';
 import { HomeProps } from './Routes';
+import { SafeAreaView } from "react-native-safe-area-context";
+import BottomNavBar from '../components/BottomNavBar';
+import ClawzerTitle from '../assets/ClawzerTitle.png';
+import Ribbon from '../assets/Ribbon.png';
+import ClawMachine from '../assets/HomeScreenClaw.png';
+import { ImageBackground } from "react-native";
+import Pxbkg from "../assets/pixbkg.png";
+import PlayButton from "../assets/PlayButton.png";
+import CoinsButton from '../components/CoinsButton.tsx';
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { user, signOut } = useAuthStore();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          {user?.picture && (
-            <Image source={{ uri: user.picture }} style={styles.avatar} />
-          )}
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user?.name}</Text>
-            <Text style={styles.userEmail}>{user?.email}</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
-          <Text style={styles.signOutButtonText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.root} edges={['top']}>
+      <ImageBackground source={Pxbkg} style={styles.bg} resizeMode="cover">
+        <View style={styles.screen}>
+          {/* CONTENT AREA (NON-SCROLLING) */}
+          <View style={styles.main}>
+            {/* HEADER */}
+            <View style={styles.headerWrapper}>
+              <View style={styles.topHeader} />
+              <View style = {styles.coinsButton}>
+                  <CoinsButton
+                  onPress = {() => navigation.navigate("Shop")}/>
+              </View>
+              <Image source={ClawzerTitle} style={styles.topLogo} />
+            </View>
 
-      <View style={styles.mainContent}>
-        <Text style={styles.title}>IoT Claw Control</Text>
-        <Text style={styles.subtitle}>Ready to play!</Text>
+            {/* RIBBONS */}
+            <View>
+              <Image source={Ribbon} style={styles.ribbonLeft} />
+              <Image source={Ribbon} style={styles.ribbonRight} />
+            </View>
 
-        {/* Navigation Buttons */}
-        <View style={styles.controlSection}>
-          <Text style={styles.sectionTitle}>Navigation</Text>
-          <View style={styles.navigationGrid}>
-            <TouchableOpacity 
-              style={[styles.navButton, styles.navButtonPrimary]}
-              onPress={() => navigation.navigate('Shop')}
-            >
-              <Text style={[styles.navButtonText, styles.navButtonPrimaryText]}>🛒 Shop</Text>
-            </TouchableOpacity>
-            {/* Add more navigation buttons here as needed */}
-          </View>
-        </View>
-
-        <View style={styles.controlSection}>
-          <Text style={styles.sectionTitle}>Machine Status</Text>
-          <View style={styles.statusCard}>
-            <Text style={styles.statusText}>Connected</Text>
-            <View style={styles.statusIndicator} />
-          </View>
-        </View>
-
-        <View style={styles.controlSection}>
-          <Text style={styles.sectionTitle}>Controls</Text>
-          <View style={styles.buttonGrid}>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.controlButtonText}>Move Left</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.controlButtonText}>Move Right</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.controlButtonText}>Move Forward</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.controlButtonText}>Move Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlButton, styles.primaryButton]}>
-              <Text style={[styles.controlButtonText, styles.primaryButtonText]}>Grab</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlButton, styles.primaryButton]}>
-              <Text style={[styles.controlButtonText, styles.primaryButtonText]}>Release</Text>
+            {/* ADD ANY OTHER STATIC CONTENT HERE */}
+            <View style={styles.clawWrapper}>
+              <Image source={ClawMachine} style={styles.clawImage} />
+            </View>
+            <TouchableOpacity style = {styles.playButtonWrapper}>
+                <View>
+                    <Image source={PlayButton} style={styles.playButtonImage} />
+                    <Text style = {styles.playButtonPlayText}>Play</Text>
+                    <Text style = {styles.playButtonCostText}>10 Tokens</Text>
+                </View>
             </TouchableOpacity>
           </View>
-        </View>
 
-        <View style={styles.controlSection}>
-          <Text style={styles.sectionTitle}>Live Stream</Text>
-          <View style={styles.streamPlaceholder}>
-            <Text style={styles.streamText}>Video Stream</Text>
-            <Text style={styles.streamSubtext}>Will connect to camera feed</Text>
-          </View>
+          {/* FIXED BOTTOM NAVBAR */}
+          <BottomNavBar
+            active="home"
+            onPressHome={() => navigation.navigate("Home", {from: "Home"})}
+            onPressMap={() => navigation.navigate("Prize", {from: "Home"})}
+            onPressProfile={() => navigation.navigate("Profile", {from: "Home"})}
+          />
         </View>
-      </View>
-    </ScrollView>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'black',
   },
-  contentContainer: {
-    paddingBottom: 20,
+
+  bg: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
-  header: {
-    backgroundColor: '#fff',
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    flexDirection: 'row',
+
+  // This wraps content + navbar and fills the screen
+  screen: {
+    flex: 1,
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+
+  // All your non-scroll content goes here
+  main: {
+    // flex: 1 means "take all remaining space above the navbar"
     flex: 1,
+    // add padding/margins if you want
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+
+  headerWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 40,
   },
-  userDetails: {
+
+  topHeader: {
+    width: 400,
+    height: 400,
+    backgroundColor: '#0B0029',
+    borderRadius: 200,
+    transform: [{ scaleX: 1.5 }],
+    borderWidth: 4,
+    borderColor: 'rgba(0, 229, 255, 0.96)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 7 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 7,
+    position: 'absolute',
+    top: -300,
+    zIndex: 2,
+  },
+
+  topLogo: {
+    width: 400,
+    height: 140,
+    position: 'absolute',
+    top: -70,
+    resizeMode: 'contain',
+    zIndex: 3,
+  },
+
+  ribbonLeft: {
+    transform: [{ rotate: '-5.4deg' }],
+    position: 'absolute',
+    top: 60,
+    left: -30,
+    zIndex: 1,
+  },
+
+  ribbonRight: {
+    transform: [{ rotate: '25.4deg' }],
+    position: 'absolute',
+    top: 60,
+    right: -30,
+    zIndex: 1,
+  },
+
+  clawWrapper: {
     flex: 1,
+    justifyContent: "flex-start",  // push claw to the bottom of main
+    alignItems: "center",        // center horizontally
+    paddingTop: 50,            // space above navbar
   },
-  userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+
+  clawImage: {
+    width: 800,                  // pick numbers that match your asset
+    height: 600,
+    resizeMode: "contain",
   },
-  userEmail: {
-    fontSize: 14,
-    color: '#666',
-  },
-  signOutButton: {
-    backgroundColor: '#dc3545',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-  },
-  signOutButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  mainContent: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-  },
-  controlSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  statusCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statusText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
-  statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#4caf50',
-  },
-  buttonGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  controlButton: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    minWidth: '47%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  primaryButton: {
-    backgroundColor: '#4285F4',
-  },
-  controlButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  primaryButtonText: {
-    color: '#fff',
-  },
-  streamPlaceholder: {
-    backgroundColor: '#fff',
-    height: 200,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  streamText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-  },
-  streamSubtext: {
-    fontSize: 14,
-    color: '#999',
-  },
-  navigationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  navButton: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    minWidth: '47%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  navButtonPrimary: {
-    backgroundColor: '#4285F4',
-  },
-  navButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  navButtonPrimaryText: {
-    color: '#fff',
-  },
+
+    playButtonWrapper: {
+        flex: 1,
+        justifyContent: "flex-start",  // push claw to the bottom of main
+        alignItems: "center",        // center horizontally
+        paddingTop: 150,            // space above navbar
+      },
+
+      playButtonImage: {
+          transform: [{scaleX: 1.2}],
+        resizeMode: "contain",
+      },
+    playButtonPlayText: {
+        position: 'absolute',
+        color: "#fff",
+          fontSize: 60,
+          fontWeight: "bold",
+          top: 108,
+          left: 35,
+          zIndex: 4
+    },
+    coinsButton: {
+        position: 'absolute',
+        top: -80,
+        right: 20
+    },
+    playButtonCostText: {
+        position: 'absolute',
+        color: "#fff",
+          fontSize: 20,
+          fontWeight: "bold",
+          top: 180,
+          left: 50,
+          zIndex: 4},
 });
 
 export default HomeScreen;
-
