@@ -87,8 +87,7 @@ const Routes = () => {
 
   return(
     <Stack.Navigator 
-//       initialRouteName={isAuthenticated ? 'Home' : 'Login'}
-      initialRouteName = "Home"
+      initialRouteName={isAuthenticated ? 'Home' : 'Login'}
       id="Stack" 
       screenOptions={{headerShown: false}}
     >
