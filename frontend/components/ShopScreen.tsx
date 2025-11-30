@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import CoinsButton from './CoinsButton';
 
 
 /// ======= 4: Add the props {route, navigation}: TYPE you exported in #3. Don't forget to import at top. 
@@ -24,7 +25,7 @@ const ShopScreen = ({route, navigation}: ShopProps) => {
         <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.navigate('Home')}}>
           <Text style={styles.backText}>{"< Back"}</Text>
         </TouchableOpacity>
-        <Text style={styles.tokenText}>Tokens: {numTokens}</Text>
+        <CoinsButton></CoinsButton>
 
       </View>
 
