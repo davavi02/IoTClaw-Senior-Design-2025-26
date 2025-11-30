@@ -13,10 +13,12 @@ import CoinsButton from '../components/CoinsButton';
 import ProfileAvatar from '../assets/icons/PFP.png';
 import ClawzerTitle from '../assets/ClawzerTitle.png';
 import useUserDataStore from '../stores/UserDataStore';
+import { useAuthStore } from '../stores/AuthStore';
 import { ProfileProps } from './Routes';
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
   const { numTokens } = useUserDataStore();
+  const { signOut } = useAuthStore();
 
   return (
     <SafeAreaView style={styles.root} edges={['none']}>
@@ -77,7 +79,10 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
                 <Text style={styles.actionButtonText}>Notifications</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={() => signOut()}
+              >
                 <Text style={styles.actionButtonText}>Logout</Text>
               </TouchableOpacity>
             </View>
@@ -242,3 +247,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
+
