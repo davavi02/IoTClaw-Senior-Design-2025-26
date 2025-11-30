@@ -5,6 +5,7 @@ import LoginScreen from './LoginScreen';
 import ShopScreen from './ShopScreen';
 import PrizeScreen from './PrizeScreen';
 import HomeScreen from './HomeScreen';
+import ProfileScreen from './ProfileScreen';
 import { useAuthStore } from '../stores/AuthStore';
 
 /// To add a routes theres some things you gotta do... I'll even comment 1, 2, 3, 4 so you can see the steps
@@ -20,6 +21,7 @@ type StackParamList = {
   Shop: undefined;
   Login: { from?: string };
   Prize: { from?: string };
+  Profile: { from?: string };
 };
 
 const Stack = createNativeStackNavigator<StackParamList, "Stack">();
@@ -104,6 +106,7 @@ const Routes = () => {
       />
       <Stack.Screen name='Shop' component={ShopScreen}></Stack.Screen>
       <Stack.Screen name='Login' component={LoginScreen}></Stack.Screen>
+      <Stack.Screen name='Profile' component={ProfileScreen}></Stack.Screen>
       <Stack.Screen
         name='Prize'
         component={PrizeScreen}
@@ -119,5 +122,6 @@ export type HomeProps = NativeStackScreenProps<StackParamList, 'Home', 'Stack'>;
 export type PrizeProps = NativeStackScreenProps<StackParamList, 'Prize', 'Stack'>;
 export type ShopProps = NativeStackScreenProps<StackParamList, 'Shop', 'Stack'>;
 export type LoginProps = NativeStackScreenProps<StackParamList, 'Login', 'Stack'>;
+export type ProfileProps = NativeStackScreenProps<StackParamList, 'Profile', 'Stack'>;
 
 export default Routes;
