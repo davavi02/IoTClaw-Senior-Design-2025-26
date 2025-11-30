@@ -18,7 +18,7 @@ import { ProfileProps } from './Routes';
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
   const { numTokens } = useUserDataStore();
-  const { signOut } = useAuthStore();
+  const { signOut, user } = useAuthStore();
 
   return (
     <SafeAreaView style={styles.root} edges={['none']}>
@@ -42,8 +42,8 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
           <View style={styles.profileCardOutline}>
             <Image source={ProfileAvatar} style={styles.profileAvatar} />
             <View style={styles.profileText}>
-              <Text style={styles.fullName}>Aryan Prasain</Text>
-              <Text style={styles.username}>@axp0874</Text>
+              <Text style={styles.fullName}>{user?.name}</Text>
+              <Text style={styles.username}>{user?.email}</Text>
             </View>
           </View>
 
