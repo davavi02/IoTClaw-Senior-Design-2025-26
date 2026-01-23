@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -28,4 +29,12 @@ func InitializeDatabase() (*DatabaseManager, error) {
 	fmt.Println("Success connecting to the DB")
 	dbmPtr := &DatabaseManager{db: dbcon}
 	return dbmPtr, nil
+}
+
+func (dbMan *DatabaseManager) BeginTransaction(ctx context.Context) (*sql.Tx, error) {
+	tx, err := dbMan.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	return tx, nil
 }
