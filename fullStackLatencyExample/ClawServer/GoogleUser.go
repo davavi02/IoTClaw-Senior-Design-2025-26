@@ -22,7 +22,7 @@ type GoogleUser struct {
 func VerifyAndGetGoogleUser(tokenString string, ctx context.Context) *GoogleUser {
 	tokenData, err := idtoken.Validate(ctx, tokenString, googleClientID)
 	if err != nil {
-		fmt.Println("Error during google sign in: %v", err)
+		fmt.Printf("Error during google sign in: %v\n", err)
 		return nil
 	}
 	user := &GoogleUser{}
