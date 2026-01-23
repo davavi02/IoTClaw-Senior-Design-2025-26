@@ -12,19 +12,20 @@ type DatabaseManager struct {
 }
 
 func InitializeDatabase() (*DatabaseManager, error) {
-	dbcon, err := sql.Open("mysql", "clawser:reallyhardpassword1@tcp(34.174.114.55:20206)/clawser")
+	dbcon, err := sql.Open("mysql", "clawser:reallyhardpassword1!@tcp(34.174.114.55:20206)/clawser")
 	if err != nil {
-		fmt.Println("Error initializing DB: %v", err)
+		fmt.Printf("Error initializing DB: %v\n", err)
 		return nil, err
 	}
 	defer dbcon.Close()
 
 	err = dbcon.Ping()
 	if err != nil {
-		fmt.Println("Error pinging DB: %v", err)
+		fmt.Printf("Error pinging DB: %v\n", err)
 		return nil, err
 	}
 
+	fmt.Println("Success connecting to the DB")
 	dbmPtr := &DatabaseManager{db: dbcon}
 	return dbmPtr, nil
 }

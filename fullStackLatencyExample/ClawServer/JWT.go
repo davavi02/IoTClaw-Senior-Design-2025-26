@@ -23,7 +23,7 @@ func createToken(userID int64, isAdmin bool) (string, error) {
 
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-		fmt.Println("Error creating JWT: %v", err)
+		fmt.Printf("Error creating JWT: %v\n", err)
 		return "", err
 	}
 
