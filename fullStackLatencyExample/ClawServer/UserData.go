@@ -34,3 +34,34 @@ func GetUserDataFromDatabase(ctx context.Context, trx *sql.Tx, user *GoogleUser)
 
 	return userData, nil
 }
+
+func InsertNewUserInDatabase(ctx context.Context, trx *sql.Tx, user *GoogleUser) (*UserData, error) {
+	res, err := trx.ExecContext(ctx, `INSERT INTO GoogleUser (GID, Email, Name, Pic) 
+		VALUES (?, ?, ?, ?)`, &user.GoogleID, &user.Email, &user.Name, &user.ProfilePic)
+	if err != nil {
+		return nil, err
+	}
+
+	//Get uid of new record so i can attach to the other ones.
+	uid, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	//Time to make records in address, and coin totals.
+	res, err = trx.ExecContext(ctx, `INSERT INTO CoinTotals (UID, Coins) VALUES 
+		(?, ?)`, &uid, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	//Lastly address this probably needs to be thought out more...
+	res, err = trx.ExecContext(ctx, `INSERT INTO UserAddress (UID, Name, Street, City, Zipcode, State)
+		VALUES (?, ?, ?, ?, ?, ?)`, &uid, &user.Name, "", "", "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserData{DatabaseUID: uid, GoogleID: user.GoogleID, Name: user.Name,
+		ProfilePic: user.ProfilePic, NumberToken: 0}, nil
+}
