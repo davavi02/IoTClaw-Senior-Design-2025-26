@@ -13,7 +13,7 @@ import (
 var secretKey = []byte("Z3JlYXRseXZhc3Rhbnl3YXlmYXZvcml0ZWJyb2tlbWlzc2luZ2NhcmVmdWxseW5vZGQ=")
 
 func createToken(userID int64, isAdmin bool) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodES256,
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"userId":   userID,
 			"isAdmin":  isAdmin,

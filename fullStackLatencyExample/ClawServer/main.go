@@ -11,6 +11,7 @@ func main() {
 	if server == nil {
 		fmt.Println("Error creating app.")
 	} else {
+		defer server.dbMan.db.Close()
 		server.Run("127.0.0.1:20206")
 	}
 }

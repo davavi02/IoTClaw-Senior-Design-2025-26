@@ -16,8 +16,8 @@ type UserData struct {
 }
 
 func GetUserDataFromDatabase(ctx context.Context, trx *sql.Tx, user *GoogleUser) (*UserData, error) {
-	row := trx.QueryRowContext(ctx, `SELECT UID, Email, Name, Pic, Coins FROM GoogleUser 
-		JOIN CoinTotals ON GoogleUser.UID = CoinTotal.UID WHERE GID = ?`, user.GoogleID)
+	row := trx.QueryRowContext(ctx, `SELECT GoogleUser.UID, Email, Name, Pic, Coins FROM GoogleUser 
+		JOIN CoinTotals ON GoogleUser.UID = CoinTotals.UID WHERE GID = ?`, user.GoogleID)
 
 	userData := &UserData{GoogleID: user.GoogleID}
 

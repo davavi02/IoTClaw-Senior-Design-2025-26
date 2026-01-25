@@ -18,7 +18,6 @@ func InitializeDatabase() (*DatabaseManager, error) {
 		fmt.Printf("Error initializing DB: %v\n", err)
 		return nil, err
 	}
-	defer dbcon.Close()
 
 	err = dbcon.Ping()
 	if err != nil {

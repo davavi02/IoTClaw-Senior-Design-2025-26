@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-const googleClientID = "YOUR_CLIENT_ID.apps.googleusercontent.com"
+const googleClientID = "973669949194-htjphkms2t4jmmtlrldmi7pcmhnsalmu.apps.googleusercontent.com"
 
 type GoogleUser struct {
 	DatabaseUID int64

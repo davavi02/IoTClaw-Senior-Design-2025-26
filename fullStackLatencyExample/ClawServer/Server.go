@@ -50,7 +50,7 @@ func (server *Server) createRoutes() bool {
 		return false
 	}
 
-	server.router.HandleFunc("api/login", server.handleGoogleLogin)
+	server.router.HandleFunc("/api/login", server.handleGoogleLogin).Methods("POST")
 
 	//==============@#!$@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@# TEMPORARY FROM OLD MAIN
 	cabHub1 := newHub("cab1122!!@@", "cli1122!!@@")
