@@ -12,6 +12,14 @@ import (
 // But I'm writing the backend real quick and if it's that important we can change it.
 var secretKey = []byte("Z3JlYXRseXZhc3Rhbnl3YXlmYXZvcml0ZWJyb2tlbWlzc2luZ2NhcmVmdWxseW5vZGQ=")
 
+type JWTData struct {
+	UserId     string `json:"userId"`
+	IsAdmin    bool   `json:"userId"`
+	UniqueId   string `json:"userId"`
+	Expiration int64  `json:"exp"`
+	jwt.RegisteredClaims
+}
+
 func createToken(userID int64, isAdmin bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
@@ -44,4 +52,22 @@ func verifyToken(tokenString string) error {
 	}
 
 	return nil
+}
+
+func getJwtData(tokenString string) *JWTData {
+	data := &JWTData{}
+	token, err := jwt.ParseWithClaims(tokenString, data, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	if !token.Valid {
+		fmt.Println("invalid token")
+		return nil
+	}
+
+	return data
 }
