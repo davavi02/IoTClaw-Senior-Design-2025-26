@@ -13,7 +13,7 @@ const googleClientID = "973669949194-htjphkms2t4jmmtlrldmi7pcmhnsalmu.apps.googl
 
 type GoogleUser struct {
 	DatabaseUID int64
-	GoogleID    string
+	GoogleID    string `json:"-"`
 	Email       string `json:"email"`
 	Name        string `json:"name"`
 	ProfilePic  string `json:"profilePic"`

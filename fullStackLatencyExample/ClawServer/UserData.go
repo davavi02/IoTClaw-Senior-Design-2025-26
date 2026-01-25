@@ -15,14 +15,34 @@ type UserData struct {
 	Jwt         string `json:"jwt,omitempty"`
 }
 
-func GetUserDataFromDatabase(ctx context.Context, trx *sql.Tx, user *GoogleUser) (*UserData, error) {
+func GetUserDataFromDatabaseByGID(ctx context.Context, trx *sql.Tx, googleID string) (*UserData, error) {
 	row := trx.QueryRowContext(ctx, `SELECT GoogleUser.UID, Email, Name, Pic, Coins FROM GoogleUser 
-		JOIN CoinTotals ON GoogleUser.UID = CoinTotals.UID WHERE GID = ?`, user.GoogleID)
+		JOIN CoinTotals ON GoogleUser.UID = CoinTotals.UID WHERE GID = ?`, googleID)
 
-	userData := &UserData{GoogleID: user.GoogleID}
+	userData := &UserData{GoogleID: googleID}
 
 	err := row.Scan(&userData.DatabaseUID, &userData.Email, &userData.Name, &userData.ProfilePic, &userData.NumberToken)
 	//Theres two case we want to handle. Doesn't exist meaning we need to make on or a actuall error.
+	if err != nil {
+		if err == sql.ErrNoRows {
+			//Didn't exist.
+			return nil, nil
+		}
+		//Actual error.
+		return nil, err
+	}
+
+	return userData, nil
+}
+
+func GetUserDataFromDatabaseByUID(ctx context.Context, trx *sql.Tx, uid int64) (*UserData, error) {
+	row := trx.QueryRowContext(ctx, `SELECT GoogleUser.GID, Email, Name, Pic, Coins FROM GoogleUser 
+		JOIN CoinTotals ON GoogleUser.UID = CoinTotals.UID WHERE GoogleUser.UID = ?`, uid)
+
+	userData := &UserData{DatabaseUID: uid}
+
+	err := row.Scan(&userData.GoogleID, &userData.Email, &userData.Name, &userData.ProfilePic, &userData.NumberToken)
+	//Theres two case we want to handle. Doesn't exist or a actuall error.
 	if err != nil {
 		if err == sql.ErrNoRows {
 			//Didn't exist.
