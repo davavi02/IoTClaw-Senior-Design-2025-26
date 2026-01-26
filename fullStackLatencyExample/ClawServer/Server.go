@@ -56,6 +56,8 @@ func (server *Server) createRoutes() bool {
 	server.router.HandleFunc("/api/profile", server.getProfileData).Methods("GET")
 	server.router.HandleFunc("/api/creategame", server.handleCreateGameRoom).Methods("POST")
 	server.router.HandleFunc("/api/join/{game}", server.handleJoinRoom).Methods("GET")
+	server.router.HandleFunc("/api/address", server.handleGetAddress).Methods("GET")
+	server.router.HandleFunc("/api/address", server.handleUpdateAddress).Methods("POST")
 
 	return true
 }
@@ -279,4 +281,106 @@ func (server *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	server.rooms.JoinGame(w, r, jwtData)
+}
+
+func (server *Server) handleGetAddress(w http.ResponseWriter, r *http.Request) {
+	jwtData := getJwtData(getAuthHeaderToken(w, r))
+	if jwtData == nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+	//Stop cabinents from getting addys
+	if jwtData.IsGame {
+		http.Error(w, "unauthorized.", http.StatusUnauthorized)
+		return
+	}
+
+	//Unnessarry db transactions but it should be fine. Just trying to stay consistent
+	//and copying and pasting from my other functions makes this go faster lol.
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	//Validating the credentials..
+	uid, err := strconv.ParseInt(jwtData.UniqueId, 10, 64)
+	if err != nil {
+		http.Error(w, "Issue getting uid.", http.StatusInternalServerError)
+		return
+	}
+
+	addyData, err := GetAddressData(r.Context(), trx, uid)
+	if err != nil {
+		http.Error(w, "Unauthorizaed.", http.StatusUnauthorized)
+		return
+	}
+
+	//Commit trx and send.
+	err = trx.Commit()
+	if err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	//Send dataa.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(addyData)
+	if err != nil {
+		http.Error(w, "Issue creating responce.", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (server *Server) handleUpdateAddress(w http.ResponseWriter, r *http.Request) {
+	jwtData := getJwtData(getAuthHeaderToken(w, r))
+	if jwtData == nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+	//Stop cabinents from updating addys
+	if jwtData.IsGame {
+		http.Error(w, "unauthorized.", http.StatusUnauthorized)
+		return
+	}
+
+	//Getting uid..
+	uid, err := strconv.ParseInt(jwtData.UniqueId, 10, 64)
+	if err != nil {
+		http.Error(w, "Issue getting uid.", http.StatusInternalServerError)
+		return
+	}
+
+	addyData := &AddressData{UniqueId: uid}
+
+	err = json.NewDecoder(r.Body).Decode(addyData)
+
+	//Unnessarry db transactions but it should be fine. Just trying to stay consistent
+	//and copying and pasting from my other functions makes this go faster lol.
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	//UPDATE
+	err = UpdateAddressData(r.Context(), trx, addyData)
+	if err != nil {
+		http.Error(w, "Issue with database", http.StatusInternalServerError)
+		return
+	}
+
+	//Commit trx and send.
+	err = trx.Commit()
+	if err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	//Send response
+	w.WriteHeader(http.StatusOK)
 }
