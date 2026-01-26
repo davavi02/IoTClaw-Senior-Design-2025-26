@@ -14,10 +14,11 @@ import (
 type Server struct {
 	router *mux.Router
 	dbMan  *DatabaseManager
+	rooms  *ActiveGames
 }
 
 func CreateServer() *Server {
-	server := &Server{}
+	server := &Server{rooms: InitializeGamerooms()}
 
 	dbManager, err := InitializeDatabase()
 	if err != nil || dbManager == nil {
@@ -53,20 +54,8 @@ func (server *Server) createRoutes() bool {
 
 	server.router.HandleFunc("/api/login", server.handleGoogleLogin).Methods("POST")
 	server.router.HandleFunc("/api/profile", server.getProfileData).Methods("GET")
-	server.router.HandleFunc("/api/creategame", serv).Methods()
-
-	//==============@#!$@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@# TEMPORARY FROM OLD MAIN
-	cabHub1 := newHub("cab1122!!@@", "cli1122!!@@")
-	go cabHub1.run()
-
-	//Create paths
-	server.router.HandleFunc("/cab1/client", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(cabHub1, w, r, false)
-	})
-
-	server.router.HandleFunc("/cab1/cab", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(cabHub1, w, r, true)
-	})
+	server.router.HandleFunc("/api/creategame", server.handleCreateGameRoom).Methods("POST")
+	server.router.HandleFunc("/api/join/{game}", server.handleJoinRoom).Methods("GET")
 
 	return true
 }
@@ -110,7 +99,7 @@ func (server *Server) handleGoogleLogin(w http.ResponseWriter, r *http.Request) 
 	}
 
 	//Got userProfile data now. Time to make the JWT
-	userProfile.Jwt, err = createToken(userProfile.DatabaseUID, false)
+	userProfile.Jwt, err = createToken(userProfile.DatabaseUID, false, false)
 	if err != nil {
 		http.Error(w, "Issue creating auth token.", http.StatusInternalServerError)
 		return
@@ -222,5 +211,72 @@ func (server *Server) getProfileData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) handleCreateGameRoom(w http.ResponseWriter, r *http.Request) {
+	gameData := &GameData{}
+	//Get json out.
+	err := json.NewDecoder(r.Body).Decode(gameData)
+	if err != nil {
+		http.Error(w, "Invalid data sent", http.StatusUnauthorized)
+		return
+	}
 
+	//Unnessarry db transactions but it should be fine. Just trying to stay consistent
+	//and copying and pasting from my other functions makes this go faster lol.
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	//Validating the credentials..
+	err = HandleGameDataLogin(r.Context(), trx, gameData)
+	if err != nil {
+		http.Error(w, "Unauthorizaed.", http.StatusUnauthorized)
+		return
+	}
+
+	///check if game exists
+	if server.rooms.DoesGameExist(gameData) {
+		//Game exists...
+		http.Error(w, "Game already made", http.StatusConflict)
+		return
+	}
+
+	if !server.rooms.CreateGame(gameData) {
+		http.Error(w, "Game creation issue", http.StatusInternalServerError)
+		return
+	}
+
+	//make a jwt and send it mann
+	token, err := createToken(gameData.UniqueId, false, true)
+	if err != nil {
+		http.Error(w, "Error issuing token", http.StatusInternalServerError)
+		return
+	}
+
+	//Commit trx and send.
+	err = trx.Commit()
+	if err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	//Send token.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(map[string]string{"jwt": token})
+	if err != nil {
+		http.Error(w, "Issue creating responce.", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (server *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
+	jwtData := getJwtData(getAuthHeaderToken(w, r))
+	if jwtData == nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+	server.rooms.JoinGame(w, r, jwtData)
 }

@@ -24,22 +24,22 @@ type Hub struct {
 	//Cabinent
 	cabinent *Client
 
-	//PAsscode for a client..
-	ClientPasscode string
+	//Information about the game
+	gameData *GameData
 
-	//if this is passed then we know it was the cabinent..
-	CabPasscode string
+	//USed to delete the game from the list when we are done.
+	activeGames *ActiveGames
 }
 
-func newHub(cabCode string, clientCode string) *Hub {
+func newHub(container *ActiveGames, gameData *GameData) *Hub {
 	return &Hub{
-		broadcast:      make(chan *Packet),
-		register:       make(chan *Client),
-		unregister:     make(chan *Client),
-		clients:        make(map[*Client]bool),
-		ClientPasscode: clientCode,
-		CabPasscode:    cabCode,
-		cabinent:       nil,
+		broadcast:   make(chan *Packet),
+		register:    make(chan *Client),
+		unregister:  make(chan *Client),
+		clients:     make(map[*Client]bool),
+		gameData:    gameData,
+		activeGames: container,
+		cabinent:    nil,
 	}
 }
 

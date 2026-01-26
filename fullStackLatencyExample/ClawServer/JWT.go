@@ -14,17 +14,19 @@ var secretKey = []byte("Z3JlYXRseXZhc3Rhbnl3YXlmYXZvcml0ZWJyb2tlbWlzc2luZ2NhcmVm
 
 type JWTData struct {
 	UserId     string `json:"userId"`
-	IsAdmin    bool   `json:"userId"`
-	UniqueId   string `json:"userId"`
+	IsAdmin    bool   `json:"isAdmin"`
+	IsGame     bool   `json:"isGame"`
+	UniqueId   string `json:"uniqueId"`
 	Expiration int64  `json:"exp"`
 	jwt.RegisteredClaims
 }
 
-func createToken(userID int64, isAdmin bool) (string, error) {
+func createToken(userID int64, isAdmin bool, isGame bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"userId":   userID,
 			"isAdmin":  isAdmin,
+			"isGame":   isGame,
 			"uniqueId": uuid.New().String(),
 			"exp":      time.Now().Add(time.Hour * 24).Unix(),
 		})

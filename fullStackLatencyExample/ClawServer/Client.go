@@ -145,20 +145,6 @@ func (c *Client) writePump() {
 
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, isCab bool) {
-	passCode := r.URL.Query().Get("passcode")
-
-	if isCab {
-		if passCode != hub.CabPasscode {
-			log.Println("Error connecting cab connection")
-			return
-		}
-	} else {
-		if passCode != hub.ClientPasscode {
-			log.Println("Error connectiong client")
-			return
-		}
-	}
-	fmt.Println("passed auth")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
