@@ -52,12 +52,17 @@ func (server *Server) createRoutes() bool {
 		return false
 	}
 
+	//These either are unprotected routes, one uses user/pass one uses
 	server.router.HandleFunc("/api/login", server.handleGoogleLogin).Methods("POST")
-	server.router.HandleFunc("/api/profile", server.getProfileData).Methods("GET")
 	server.router.HandleFunc("/api/creategame", server.handleCreateGameRoom).Methods("POST")
-	server.router.HandleFunc("/api/join/{game}", server.handleJoinRoom).Methods("GET")
-	server.router.HandleFunc("/api/address", server.handleGetAddress).Methods("GET")
-	server.router.HandleFunc("/api/address", server.handleUpdateAddress).Methods("POST")
+
+	//These are protected by our jwts
+	apiRoute := server.router.PathPrefix("/api").Subrouter()
+	apiRoute.HandleFunc("/profile", server.getProfileData).Methods("GET")
+	apiRoute.HandleFunc("/join/{game}", server.handleJoinRoom).Methods("GET")
+	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
+	apiRoute.HandleFunc("/address", server.handleUpdateAddress).Methods("POST")
+	apiRoute.Use(authCheckMiddleware)
 
 	return true
 }
@@ -244,7 +249,7 @@ func (server *Server) handleCreateGameRoom(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if !server.rooms.CreateGame(gameData) {
+	if server.rooms.CreateGame(gameData) {
 		http.Error(w, "Game creation issue", http.StatusInternalServerError)
 		return
 	}
@@ -305,7 +310,7 @@ func (server *Server) handleGetAddress(w http.ResponseWriter, r *http.Request) {
 	defer trx.Rollback()
 
 	//Validating the credentials..
-	uid, err := strconv.ParseInt(jwtData.UniqueId, 10, 64)
+	uid, err := strconv.ParseInt(jwtData.UserId, 10, 64)
 	if err != nil {
 		http.Error(w, "Issue getting uid.", http.StatusInternalServerError)
 		return
@@ -348,7 +353,7 @@ func (server *Server) handleUpdateAddress(w http.ResponseWriter, r *http.Request
 	}
 
 	//Getting uid..
-	uid, err := strconv.ParseInt(jwtData.UniqueId, 10, 64)
+	uid, err := strconv.ParseInt(jwtData.UserId, 10, 64)
 	if err != nil {
 		http.Error(w, "Issue getting uid.", http.StatusInternalServerError)
 		return

@@ -20,7 +20,7 @@ func (container *ActiveGames) CreateGame(game *GameData) bool {
 	defer container.Unlock()
 
 	_, ok := container.activeGame[game.Name]
-	if !ok {
+	if ok {
 		return ok
 	}
 

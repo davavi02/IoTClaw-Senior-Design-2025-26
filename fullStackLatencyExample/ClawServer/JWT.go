@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,23 +14,25 @@ import (
 var secretKey = []byte("Z3JlYXRseXZhc3Rhbnl3YXlmYXZvcml0ZWJyb2tlbWlzc2luZ2NhcmVmdWxseW5vZGQ=")
 
 type JWTData struct {
-	UserId     string `json:"userId"`
-	IsAdmin    bool   `json:"isAdmin"`
-	IsGame     bool   `json:"isGame"`
-	UniqueId   string `json:"uniqueId"`
-	Expiration int64  `json:"exp"`
+	UserId   string `json:"userId"`
+	IsAdmin  bool   `json:"isAdmin"`
+	IsGame   bool   `json:"isGame"`
+	UniqueId string `json:"uniqueId"`
 	jwt.RegisteredClaims
 }
 
 func createToken(userID int64, isAdmin bool, isGame bool) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"userId":   userID,
-			"isAdmin":  isAdmin,
-			"isGame":   isGame,
-			"uniqueId": uuid.New().String(),
-			"exp":      time.Now().Add(time.Hour * 24).Unix(),
-		})
+	claims := &JWTData{
+		UserId:   strconv.FormatInt(userID, 10),
+		IsAdmin:  isAdmin,
+		IsGame:   isGame,
+		UniqueId: uuid.New().String(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {

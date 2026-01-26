@@ -6,8 +6,8 @@ import (
 )
 
 type UserData struct {
-	DatabaseUID int64
-	GoogleID    string
+	DatabaseUID int64  `json:"-"`
+	GoogleID    string `json:"-"`
 	Email       string `json:"email"`
 	Name        string `json:"name"`
 	ProfilePic  string `json:"profilePic"`

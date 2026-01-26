@@ -43,7 +43,7 @@ func UpdateAddressData(ctx context.Context, trx *sql.Tx, data *AddressData) erro
 
 	res, err := stmt.ExecContext(ctx, &data.Name, &data.Street, &data.City, &data.Zipcode, &data.State, &data.UniqueId)
 	numAffect, _ := res.RowsAffected()
-	if err != nil || numAffect != 1 {
+	if err != nil || numAffect > 1 {
 		return sql.ErrNoRows //makes debugging suck but this is all i got lol
 	}
 
