@@ -70,6 +70,9 @@ func (container *ActiveGames) GetGamesList(w http.ResponseWriter, r *http.Reques
 	jsonFormated := make(map[string][]*GameData)
 	jsonFormated["games"] = data
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	err := json.NewEncoder(w).Encode(jsonFormated)
 	if err != nil {
 		http.Error(w, "Issue with database", http.StatusInternalServerError)
