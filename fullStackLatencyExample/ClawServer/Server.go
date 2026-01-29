@@ -60,6 +60,7 @@ func (server *Server) createRoutes() bool {
 	apiRoute := server.router.PathPrefix("/api").Subrouter()
 	apiRoute.HandleFunc("/profile", server.getProfileData).Methods("GET")
 	apiRoute.HandleFunc("/join/{game}", server.handleJoinRoom).Methods("GET")
+	apiRoute.HandleFunc("/games", server.handleGetGames).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleUpdateAddress).Methods("POST")
 	apiRoute.Use(authCheckMiddleware)
@@ -388,4 +389,12 @@ func (server *Server) handleUpdateAddress(w http.ResponseWriter, r *http.Request
 
 	//Send response
 	w.WriteHeader(http.StatusOK)
+}
+
+func (server *Server) handleGetGames(w http.ResponseWriter, r *http.Request) {
+	err := server.rooms.GetGamesList(w, r)
+	if err != nil {
+		fmt.Println("Error, getting games list.")
+		return
+	}
 }

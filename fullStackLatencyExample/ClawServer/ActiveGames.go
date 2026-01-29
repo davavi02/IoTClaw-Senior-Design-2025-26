@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"sync"
 )
@@ -54,4 +55,26 @@ func (container *ActiveGames) JoinGame(w http.ResponseWriter, r *http.Request, d
 		}
 	}
 	serveWs(hub, w, r, data.IsGame)
+}
+
+// Realistically if I was doing something more production ready this would be cached...
+func (container *ActiveGames) GetGamesList(w http.ResponseWriter, r *http.Request) error {
+	container.Lock()
+	defer container.Unlock()
+
+	data := make([]*GameData, 0, len(container.activeGame))
+	for _, game := range container.activeGame {
+		data = append(data, game.gameData)
+	}
+
+	jsonFormated := make(map[string][]*GameData)
+	jsonFormated["games"] = data
+
+	err := json.NewEncoder(w).Encode(jsonFormated)
+	if err != nil {
+		http.Error(w, "Issue with database", http.StatusInternalServerError)
+		return err
+	}
+
+	return nil
 }
