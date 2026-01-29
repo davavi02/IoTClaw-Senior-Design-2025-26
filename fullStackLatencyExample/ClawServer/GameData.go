@@ -6,7 +6,7 @@ import (
 )
 
 type GameData struct {
-	UniqueId    int64  `json:"uniqueId"`
+	UniqueId    int64  `json:"-"`
 	Name        string `json:"name"`
 	PassHash    string `json:"password,omitempty"`
 	Description string `json:"description"`
@@ -23,6 +23,9 @@ func HandleGameDataLogin(ctx context.Context, tx *sql.Tx, data *GameData) error 
 	if err != nil {
 		return err
 	}
+
+	//Remove the password, dont wanna keep around. Marked as omit empyu as well. honestly should probably be passed a var
+	data.PassHash = ""
 
 	return nil
 }
