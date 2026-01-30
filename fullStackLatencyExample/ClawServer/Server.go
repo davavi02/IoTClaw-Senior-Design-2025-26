@@ -59,6 +59,7 @@ func (server *Server) createRoutes() bool {
 	//These are protected by our jwts
 	apiRoute := server.router.PathPrefix("/api").Subrouter()
 	apiRoute.HandleFunc("/profile", server.getProfileData).Methods("GET")
+	apiRoute.HandleFunc("/tokens", server.handleGetTokens).Methods("GET")
 	apiRoute.HandleFunc("/join/{game}", server.handleJoinRoom).Methods("GET")
 	apiRoute.HandleFunc("/games", server.handleGetGames).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
@@ -396,5 +397,35 @@ func (server *Server) handleGetGames(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error, getting games list.")
 		return
+	}
+}
+
+func (server *Server) handleGetTokens(w http.ResponseWriter, r *http.Request) {
+	//Get the users data.
+	jwtData := getJwtData(getAuthHeaderToken(w, r))
+	if jwtData == nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+
+	//TODO Fix this needless conversion from strings to int64 when the test tokens expire..
+	uid, err := strconv.ParseInt(jwtData.UserId, 10, 64)
+	if err != nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+
+	tokenData := GetUserTokenData(r.Context(), server.dbMan.db, uid)
+	if tokenData == nil {
+		http.Error(w, "Issue retrieving records.", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(tokenData)
+	if err != nil {
+		http.Error(w, "Error parsing json.", http.StatusInternalServerError)
 	}
 }
