@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"sync"
+
+	"github.com/gorilla/mux"
 )
 
 type ActiveGames struct {
@@ -42,8 +44,9 @@ func (container *ActiveGames) DoesGameExist(game *GameData) bool {
 // Todo i think this has a bug where a clinet can join the same room accross devices
 func (container *ActiveGames) JoinGame(w http.ResponseWriter, r *http.Request, data *JWTData) {
 	container.Lock()
-	defer container.Lock()
-	gameName := r.URL.Query().Get("game")
+	defer container.Unlock()
+	vars := mux.Vars(r)
+	gameName := vars["game"]
 	hub, ok := container.activeGame[gameName]
 	if !ok {
 		http.Error(w, "Game does not exist", http.StatusBadRequest)
