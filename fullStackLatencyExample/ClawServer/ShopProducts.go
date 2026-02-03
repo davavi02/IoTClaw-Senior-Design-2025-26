@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -52,4 +53,21 @@ func GetShopProducts(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func PurchaseProduct(ctx context.Context, trx *sql.Tx, pid int64, uid int64) *UserTokenData {
+	productData := &ShopProducts{UniqueId: pid}
+
+	err := trx.QueryRowContext(ctx, "SELECT NumTokens FROM TokenShop WHERE UID = ?", &pid).Scan(&productData.NumTokens)
+	if err != nil {
+		fmt.Printf("DB error trying to purchase products: %v\n", err)
+		return nil
+	}
+
+	_, err = trx.ExecContext(ctx, "UPDATE CoinTotals Set Coins = Coins + ? WHERE UID = ?", &productData.NumTokens, &uid)
+	if err != nil {
+		fmt.Printf("DB error trying to purchase products: %v\n", err)
+		return nil
+	}
+	return GetUserTokenDataTrx(ctx, trx, uid)
 }

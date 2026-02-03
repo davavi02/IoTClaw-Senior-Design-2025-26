@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,16 +14,20 @@ import (
 var secretKey = []byte("Z3JlYXRseXZhc3Rhbnl3YXlmYXZvcml0ZWJyb2tlbWlzc2luZ2NhcmVmdWxseW5vZGQ=")
 
 type JWTData struct {
-	UserId   int64  `json:"userId"`
+	UserId   string `json:"userId"`
 	IsAdmin  bool   `json:"isAdmin"`
 	IsGame   bool   `json:"isGame"`
 	UniqueId string `json:"uniqueId"`
 	jwt.RegisteredClaims
 }
 
+func (token *JWTData) GetUserIdAsInt64() (int64, error) {
+	return strconv.ParseInt(token.UserId, 10, 64)
+}
+
 func createToken(userID int64, isAdmin bool, isGame bool) (string, error) {
 	claims := &JWTData{
-		UserId:   userID,
+		UserId:   strconv.FormatInt(userID, 10),
 		IsAdmin:  isAdmin,
 		IsGame:   isGame,
 		UniqueId: uuid.New().String(),

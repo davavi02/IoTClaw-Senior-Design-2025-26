@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -64,7 +65,7 @@ func (server *Server) createRoutes() bool {
 	apiRoute.HandleFunc("/shop", server.handleGetProducts).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleUpdateAddress).Methods("POST")
-	apiRoute.HandleFunc("/buy/{id}", server.handleUpdateAddress).Methods("POST")
+	apiRoute.HandleFunc("/buy/{id}", server.handleBuyProduct).Methods("POST")
 	apiRoute.Use(authCheckMiddleware)
 
 	return true
@@ -188,8 +189,15 @@ func (server *Server) getProfileData(w http.ResponseWriter, r *http.Request) {
 	}
 	defer trx.Rollback()
 
+	//Get uid..
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
 	//See if user exists and get it if it does.
-	userProfile, err := GetUserDataFromDatabaseByUID(r.Context(), trx, jwtData.UserId)
+	userProfile, err := GetUserDataFromDatabaseByUID(r.Context(), trx, uid)
 	//two things can go wrong here its not in db so we make one or actual err
 	if err != nil {
 		http.Error(w, "Issue with database.", http.StatusInternalServerError)
@@ -306,7 +314,14 @@ func (server *Server) handleGetAddress(w http.ResponseWriter, r *http.Request) {
 	}
 	defer trx.Rollback()
 
-	addyData, err := GetAddressData(r.Context(), trx, jwtData.UserId)
+	//Get uid..
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	addyData, err := GetAddressData(r.Context(), trx, uid)
 	if err != nil {
 		http.Error(w, "Unauthorizaed.", http.StatusUnauthorized)
 		return
@@ -342,9 +357,16 @@ func (server *Server) handleUpdateAddress(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	addyData := &AddressData{UniqueId: jwtData.UserId}
+	//Get uid..
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
 
-	err := json.NewDecoder(r.Body).Decode(addyData)
+	addyData := &AddressData{UniqueId: uid}
+
+	err = json.NewDecoder(r.Body).Decode(addyData)
 
 	//Unnessarry db transactions but it should be fine. Just trying to stay consistent
 	//and copying and pasting from my other functions makes this go faster lol.
@@ -389,7 +411,14 @@ func (server *Server) handleGetTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenData := GetUserTokenData(r.Context(), server.dbMan.db, jwtData.UserId)
+	//Get uid..
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	tokenData := GetUserTokenData(r.Context(), server.dbMan.db, uid)
 	if tokenData == nil {
 		http.Error(w, "Issue retrieving records.", http.StatusInternalServerError)
 		return
@@ -398,7 +427,7 @@ func (server *Server) handleGetTokens(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	err := json.NewEncoder(w).Encode(tokenData)
+	err = json.NewEncoder(w).Encode(tokenData)
 	if err != nil {
 		http.Error(w, "Error parsing json.", http.StatusInternalServerError)
 	}
@@ -408,6 +437,70 @@ func (server *Server) handleGetProducts(w http.ResponseWriter, r *http.Request) 
 	err := GetShopProducts(w, r, server.dbMan.db)
 	if err != nil {
 		fmt.Println("Error getting shop products.")
+		return
+	}
+}
+
+func (server *Server) handleBuyProduct(w http.ResponseWriter, r *http.Request) {
+	jwtData := getJwtData(getAuthHeaderToken(w, r))
+	if jwtData == nil {
+		http.Error(w, "Issue authorizing.", http.StatusUnauthorized)
+		return
+	}
+
+	//Stop cabinents from buying tokens
+	if jwtData.IsGame {
+		http.Error(w, "unauthorized.", http.StatusUnauthorized)
+		return
+	}
+
+	//Get product id passed
+	vars := mux.Vars(r)
+	pidString := vars["id"]
+
+	//converyt to int64
+	pid, err := strconv.ParseInt(pidString, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid url.", http.StatusBadRequest)
+		return
+	}
+
+	//Unnessarry db transactions but it should be fine. Just trying to stay consistent
+	//and copying and pasting from my other functions makes this go faster lol.
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	//Get uid..
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	tokenData := PurchaseProduct(r.Context(), trx, pid, uid)
+	if err != nil {
+		http.Error(w, "Unauthorizaed.", http.StatusUnauthorized)
+		return
+	}
+
+	//Commit trx and send.
+	err = trx.Commit()
+	if err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	//Send dataa.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(tokenData)
+	if err != nil {
+		http.Error(w, "Issue creating responce.", http.StatusInternalServerError)
 		return
 	}
 }
