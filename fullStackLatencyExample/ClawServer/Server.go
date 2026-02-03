@@ -62,6 +62,7 @@ func (server *Server) createRoutes() bool {
 	apiRoute.HandleFunc("/tokens", server.handleGetTokens).Methods("GET")
 	apiRoute.HandleFunc("/join/{game}", server.handleJoinRoom).Methods("GET")
 	apiRoute.HandleFunc("/games", server.handleGetGames).Methods("GET")
+	apiRoute.HandleFunc("/shop", server.handleGetGames).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleUpdateAddress).Methods("POST")
 	apiRoute.Use(authCheckMiddleware)
@@ -427,5 +428,13 @@ func (server *Server) handleGetTokens(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(tokenData)
 	if err != nil {
 		http.Error(w, "Error parsing json.", http.StatusInternalServerError)
+	}
+}
+
+func (server *Server) handleGetProducts(w http.ResponseWriter, r *http.Request) {
+	err := GetShopProducts(w, r, server.dbMan.db)
+	if err != nil {
+		fmt.Println("Error getting shop products.")
+		return
 	}
 }
