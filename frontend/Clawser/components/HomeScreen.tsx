@@ -47,7 +47,9 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             <View style={styles.clawWrapper}>
               <Image source={ClawMachine} style={styles.clawImage} />
             </View>
-            <TouchableOpacity style = {styles.playButtonWrapper}>
+            <TouchableOpacity style = {styles.playButtonWrapper}
+                  onPress={() => navigation.navigate("Play", { from: "Home" })}
+                    >
                 <View>
                     <Image source={PlayButton} style={styles.playButtonImage} />
                     <Text style = {styles.playButtonPlayText}>Play</Text>
@@ -189,6 +191,9 @@ const styles = StyleSheet.create({
           top: 180,
           left: 50,
           zIndex: 4},
-});
+
+
+      }
+);
 
 export default HomeScreen;
