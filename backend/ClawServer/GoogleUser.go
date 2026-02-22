@@ -10,6 +10,7 @@ import (
 )
 
 const googleClientID = "973669949194-htjphkms2t4jmmtlrldmi7pcmhnsalmu.apps.googleusercontent.com"
+const androidClientID = "973669949194-claasjhgvpu9v9ops7iesps06t57f203.apps.googleusercontent.com"
 
 type GoogleUser struct {
 	DatabaseUID int64
@@ -22,8 +23,13 @@ type GoogleUser struct {
 func VerifyAndGetGoogleUser(tokenString string, ctx context.Context) *GoogleUser {
 	tokenData, err := idtoken.Validate(ctx, tokenString, googleClientID)
 	if err != nil {
-		fmt.Printf("Error during google sign in: %v\n", err)
-		return nil
+		//Check android.
+		tokenData, err = idtoken.Validate(ctx, tokenString, androidClientID)
+		if err != nil {
+			fmt.Printf("Error validating Google ID token: %v\n", err)
+			return nil
+		}
+
 	}
 	user := &GoogleUser{}
 
