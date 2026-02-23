@@ -17,13 +17,13 @@ import { ImageBackground } from "react-native";
 import Pxbkg from "../assets/pixbkg.png";
 import PlayButton from "../assets/PlayButton.png";
 import CoinsButton from '../components/CoinsButton.tsx';
+import Background from './Background';
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { user, signOut } = useAuthStore();
 
   return (
-    <SafeAreaView style={styles.root} edges={['top']}>
-      <ImageBackground source={Pxbkg} style={styles.bg} resizeMode="cover">
+    <Background>
         <View style={styles.screen}>
           {/* CONTENT AREA (NON-SCROLLING) */}
           <View style={styles.main}>
@@ -66,8 +66,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             onPressProfile={() => navigation.navigate("Profile", {from: "Home"})}
           />
         </View>
-      </ImageBackground>
-    </SafeAreaView>
+</Background>
   );
 };
 
@@ -75,12 +74,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: 'black',
-  },
-
-  bg: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
   },
 
   // This wraps content + navbar and fills the screen

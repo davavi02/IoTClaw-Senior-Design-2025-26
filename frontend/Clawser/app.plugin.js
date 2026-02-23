@@ -22,7 +22,7 @@ module.exports = function withAndroidOAuthIntentFilter(config) {
     }
 
     // Check if the reverse client ID intent filter already exists
-    const reverseClientIdScheme = 'com.googleusercontent.apps.832482974548-611q2nuek1midi2hasi3m28ilp680ckj';
+    const reverseClientIdScheme = 'com.googleusercontent.apps.973669949194-claasjhgvpu9v9ops7iesps06t57f203';
     const existingFilter = mainActivity['intent-filter'].find((filter) => {
       const data = filter.data;
       if (!data || !Array.isArray(data)) return false;

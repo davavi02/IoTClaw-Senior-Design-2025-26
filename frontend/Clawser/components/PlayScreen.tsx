@@ -1,18 +1,21 @@
 import React from "react";
+import { ImageBackground, Pressable } from "react-native";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
+import Background from "./Background";
+import HeaderBar from "./HeaderBar";
+
 
 
 const {width} = Dimensions.get("window");
-const STREAM_URL = "http://34.174.255.99:8888/test";
+const STREAM_URL = "http://34.174.255.99:8889/test";
 
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.root}>
-
+      <Background>
+        <HeaderBar/>
         {/* Back Button*/}
         <TouchableOpacity
           style={styles.backButton}
@@ -42,17 +45,27 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.container}>
-        <Text style={styles.title}>Play Screen</Text>
-        <Text>Put your claw-machine controls here 👇</Text>
+        <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
+          <Text>Up</Text>
+        </Pressable>
+        <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
+          <Text>Down</Text>
+        </Pressable>
+    borderColor: "rgba(0, 229, 255, 0.96)",
+        <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
+          <Text>Left</Text>
+        </Pressable>
+        <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
+          <Text>Up</Text>
+        </Pressable>
       </View>
-    </SafeAreaView>
+      </Background>
   );
 };
 
 export default PlayScreen;
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "white" },
   container: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: { color: "white", fontSize: 28, fontWeight: "bold", marginBottom: 10 },
 
@@ -76,11 +89,11 @@ const styles = StyleSheet.create({
     streamWrap: 
     {
     alignItems: "center",
-    marginTop: 70, // adjust so it sits under your back button
+    marginTop: 100, // adjust so it sits under your back button
     },
     streamFrame: 
     {
-    width: Math.min(width * 0.92, 420),
+    width: Math.min(width, 420),
     aspectRatio: 16 / 9,
     borderRadius: 12,
     overflow: "hidden",
@@ -90,6 +103,13 @@ const styles = StyleSheet.create({
     webview: { width: "100%", height: "100%" },
 
     body: { flex: 1 },
+
+
+    bg: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
 
 }
 );

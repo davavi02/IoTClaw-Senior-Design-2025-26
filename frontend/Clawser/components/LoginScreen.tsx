@@ -21,14 +21,14 @@ const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   const clawzerTitle = require("../assets/ClawzerTitle.png");
   const clawMachine = require("../assets/ClawMachine.png");
 
-  React.useEffect(() => {
+  /*React.useEffect(() => {
     // Log debug info on mount
     const AuthService = require('../services/AuthService').default;
     const info = AuthService.getDebugInfo();
     const infoString = `Platform: ${info.platform}\nClient ID: ${info.clientId.substring(0, 20)}...\nRedirect URI: ${info.redirectUri}`;
     setDebugInfo(infoString);
     console.log('Auth Debug Info:', info);
-  }, []);
+  }, []);*/
 
   // Reset error state when screen comes into focus
   useFocusEffect(

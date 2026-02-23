@@ -22,7 +22,7 @@
           {
             "CFBundleURLSchemes": [
               "frontend",
-              "com.googleusercontent.apps.832482974548-cugsmg65capsk4hdmr4eeimuat6rb9le"
+              "com.googleusercontent.apps.973669949194-claasjhgvpu9v9ops7iesps06t57f203"
             ]
           }
         ],
@@ -33,6 +33,7 @@
       }
     },
     "android": {
+      "permissions": ["CAMERA", "RECORD_AUDIO", "ACCESS_NETWORK_STATE", "MODIFY_AUDIO_SETTINGS"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/claw_icon.png",
         "backgroundColor": "#ffffff"
@@ -44,6 +45,7 @@
         {
           "action": "VIEW",
           "autoVerify": false,
+
           "data": [
             {
               "scheme": "frontend"
@@ -56,7 +58,7 @@
           "autoVerify": false,
           "data": [
             {
-              "scheme": "com.googleusercontent.apps.832482974548-611q2nuek1midi2hasi3m28ilp680ckj"
+              "scheme": "com.googleusercontent.apps.973669949194-claasjhgvpu9v9ops7iesps06t57f203"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
@@ -68,7 +70,21 @@
     },
     "plugins": [
       "expo-font",
-      "./app.plugin.js"
+      "./app.plugin.js",
+      [
+        "expo-build-properties",
+        {
+          "android": 
+          {
+            "debugSigningConfig": {
+            "storeFile": "../../credentials/debug.keystore",
+            "storePassword": "android",
+            "keyAlias": "androiddebugkey",
+            "keyPassword": "android"
+            }
+          }
+        }
+      ]
     ]
   }
 }
