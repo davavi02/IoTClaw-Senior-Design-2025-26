@@ -31,6 +31,7 @@ async def main():
                     if message == 7:
                         gameActive = True
                         print("Starting Game")
+                        await moveClaw(message)
 
 
 

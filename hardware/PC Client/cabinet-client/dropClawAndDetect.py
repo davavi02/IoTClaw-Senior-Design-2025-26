@@ -4,4 +4,4 @@ from moveClaw import moveClaw
 
 async def dropClawAndDetect():
     print("Dropping and Detecting")
-    moveClaw(5)
+    await moveClaw(5)
