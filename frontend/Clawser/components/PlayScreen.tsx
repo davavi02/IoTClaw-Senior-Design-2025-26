@@ -51,7 +51,6 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation }) => {
         <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
           <Text>Down</Text>
         </Pressable>
-    borderColor: "rgba(0, 229, 255, 0.96)",
         <Pressable style={{ marginTop: 20, padding: 10, backgroundColor: "#007AFF", borderRadius: 5 }}>
           <Text>Left</Text>
         </Pressable>
