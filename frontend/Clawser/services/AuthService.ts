@@ -6,6 +6,8 @@ class AuthService {
       // IMPORTANT: Use your WEB Client ID here. 
       // This ensures the idToken can be verified by your Go backend.
       webClientId: '973669949194-htjphkms2t4jmmtlrldmi7pcmhnsalmu.apps.googleusercontent.com',
+      iosClientId: '973669949194-qtpfvhlg1df90k37md12phfuru4r7974.apps.googleusercontent.com',
+
       offlineAccess: true,
     });
   }

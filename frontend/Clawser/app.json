@@ -18,11 +18,16 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.iotclaw.frontend",
       "infoPlist": {
+        "NSAppTransportSecurity": 
+        {
+            "NSAllowsArbitraryLoads": true
+        },
+
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
               "frontend",
-              "com.googleusercontent.apps.973669949194-claasjhgvpu9v9ops7iesps06t57f203"
+              "com.googleusercontent.apps.973669949194-qtpfvhlg1df90k37md12phfuru4r7974"
             ]
           }
         ],
@@ -73,6 +78,7 @@
       "./app.plugin.js",
       [
         "expo-build-properties",
+      
         {
           "android": 
           {
@@ -83,6 +89,13 @@
             "keyPassword": "android"
             }
           }
+        
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+        "iosUrlScheme": "com.googleusercontent.apps.973669949194-qtpfvhlg1df90k37md12phfuru4r7974"
         }
       ]
     ]
