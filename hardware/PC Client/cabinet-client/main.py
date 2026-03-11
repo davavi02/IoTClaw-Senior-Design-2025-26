@@ -23,8 +23,11 @@ async def main():
                         asyncio.create_task(moveClaw(message))
                     elif message == 5:
                         gameActive = False
-                        await dropClawAndDetect()
-                        print("Ending game")
+                        print("Ending game, checking for prize...")
+                        if await dropClawAndDetect():
+                            print("Prize won")
+                        else:
+                            print("No prize")
                     elif message == 6:
                         asyncio.create_task(toggleCamera())
                 else:
