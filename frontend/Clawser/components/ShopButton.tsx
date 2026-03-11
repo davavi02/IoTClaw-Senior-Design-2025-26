@@ -1,5 +1,6 @@
 import React from 'react';
 import useUserDataStore from '../stores/UserDataStore';
+import { callProtectedRoute } from '../services/ApiService';
 import {
   View,
   Text,
@@ -11,17 +12,34 @@ import {
 } from 'react-native';
 
 interface ShopButtonProps {
+  productId: string;
   numToken: number;
   price: string;
   img: ImageSourcePropType;
 }
 
-const ShopButton = ({numToken, price, img}: ShopButtonProps) => {
+const ShopButton = ({productId, numToken, price, img}: ShopButtonProps) => {
 
   const { setTokens } = useUserDataStore();
 
-  const HandlePurchase = (evert: GestureResponderEvent) => {
-    setTokens(numToken);
+  const HandlePurchase = async () => {
+    //post for buying tokens /api/buy/(num)
+    try {
+      const response = await callProtectedRoute(`/api/buy/${productId}`, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+
+        setTokens(updatedData.tokens);
+        console.log("Purchase successful");
+      } else {
+        console.log("Purchase failed");
+      }
+    } catch (error) {
+      console.error("Purchase error: ", error);
+    }
   };
 
   return (

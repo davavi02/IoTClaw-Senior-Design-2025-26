@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import AuthService, { UserInfo } from '../services/AuthService';
+import * as SecureStore from 'expo-secure-store';
+import { jwtDecode } from 'jwt-decode';
+import useUserDataStore from './UserDataStore';
+
+const JWT_SECURE = 'userJWT';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -8,15 +13,74 @@ interface AuthState {
   error: string | null;
   
   signIn: () => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   clearError: () => void;
+  checkSavedToken: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   user: null,
   isLoading: false,
   error: null,
+
+  //function to auto login as long as JWT is valid (7 day expire time)
+  //when user logs in we store the returned JWT into secure storage, when user closes and reopens app we can check it and auto sign in if valid
+  //on sign out we delete the JWT and wipe the local userdata which is reset at login
+  checkSavedToken: async () => {
+    try {
+      const savedJwt = await SecureStore.getItemAsync(JWT_SECURE);
+
+      if (savedJwt) {
+        //use jwt-decode so we can get the expiration date of the JWT
+        const decodedToken = jwtDecode(savedJwt);
+
+        const currTime = Date.now() / 1000;
+
+        if (decodedToken.exp && decodedToken.exp > currTime) {
+
+          console.log("Token is valid.");
+          const response = await fetch('http://34.174.243.193:20206/api/profile', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${savedJwt}` },
+          });
+
+          if (response.ok) {
+            const profileData = await response.json();
+
+            useUserDataStore.getState().setUserData(profileData.name, profileData.tokens);
+
+            set({
+              isAuthenticated: true,
+              user: {
+                email: profileData.email,
+                name: profileData.name,
+                picture: profileData.profilePic,
+                tokens: profileData.tokens,
+              }
+            });
+            console.log("Auto login complete")
+          } else {
+            console.log("Server rejected token.")
+            await SecureStore.deleteItemAsync(JWT_SECURE);
+            set({ isAuthenticated: false, user: null });
+            useUserDataStore.getState().clearUserData();
+          }
+
+        } else {
+          console.log("Token is expired.");
+          await SecureStore.deleteItemAsync(JWT_SECURE);
+          set({ isAuthenticated: false, user: null });
+          useUserDataStore.getState().clearUserData();
+        }
+      }
+    } catch(error) {
+      console.error("Failed to load token or profile.", error);
+      await SecureStore.deleteItemAsync(JWT_SECURE);
+      set({ isAuthenticated: false, user: null });
+      useUserDataStore.getState().clearUserData();
+    }
+  },
 
   signIn: async () => {
     set({ isLoading: true, error: null });
@@ -29,6 +93,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (result.jwt) {
         console.log('✅ Sign-in successful - setting authenticated state');
         console.log('User:', result.email);
+        await SecureStore.setItemAsync(JWT_SECURE, result.jwt);
+
+        useUserDataStore.getState().setUserData(result.name, result.tokens);
+
         set({
           isAuthenticated: true,
           user: {
@@ -61,7 +129,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  signOut: () => {
+  signOut: async () => {
+    await SecureStore.deleteItemAsync(JWT_SECURE);
+
+    useUserDataStore.getState().clearUserData();
+
     set({
       isAuthenticated: false,
       user: null,

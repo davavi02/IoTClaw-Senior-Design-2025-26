@@ -48,7 +48,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
               <Image source={ClawMachine} style={styles.clawImage} />
             </View>
             <TouchableOpacity style = {styles.playButtonWrapper}
-                  onPress={() => navigation.navigate("Play", { from: "Home" })}
+                  onPress={() => navigation.navigate("CabSelect")}
                     >
                 <View>
                     <Image source={PlayButton} style={styles.playButtonImage} />

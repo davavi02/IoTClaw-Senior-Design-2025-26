@@ -1,12 +1,13 @@
 import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LoginScreen from './LoginScreen';
 import ShopScreen from './ShopScreen';
 import PrizeScreen from './PrizeScreen';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
 import PlayScreen from './PlayScreen';
+import CabSelectionScreen from './CabSelectionScreen';
 import { useAuthStore } from '../stores/AuthStore';
 
 /// To add a routes theres some things you gotta do... I'll even comment 1, 2, 3, 4 so you can see the steps
@@ -23,7 +24,8 @@ type StackParamList = {
   Login: { from?: string };
   Prize: { from?: string };
   Profile: { from?: string };
-  Play: { from?: string };
+  Play: { cab: string };
+  CabSelect: undefined;
 };
 
 const Stack = createNativeStackNavigator<StackParamList, "Stack">();
@@ -31,10 +33,19 @@ const Stack = createNativeStackNavigator<StackParamList, "Stack">();
 /// ======= 2: Add your route here, name is important as you will use it to refer to what screen
 /// =======    For debugging you should probably change initialRouteName to the one you want.
 const Routes = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, checkSavedToken } = useAuthStore();
   const navigation = useNavigation();
   const prevAuthState = useRef(isAuthenticated);
   const isNavigating = useRef(false);
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      await checkSavedToken();
+      setIsCheckingToken(false);  //done checking for JWT, render now
+    };
+    initAuth();
+  }, [checkSavedToken]);
 
   // Only navigate when authentication state actually changes (login/logout)
   // Don't interfere with normal navigation between authenticated screens
@@ -49,35 +60,39 @@ const Routes = () => {
     });
     
     // Only handle navigation when auth state changes (not on every render)
-    if (authStateChanged && !isNavigating.current) {
+    if (authStateChanged && !isNavigating.current && !isCheckingToken) {
       isNavigating.current = true;
       
       if (isAuthenticated) {
         // User just logged in - navigate to Home (homepage)
         // Use reset to clear navigation stack and set Home as root
         console.log('✅ User authenticated - navigating to Home (homepage)');
-        try {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' as never }],
-          });
-          console.log('✅ Navigation to Home completed');
-        } catch (error) {
-          console.error('❌ Navigation error:', error);
-        }
+        requestAnimationFrame(() => {
+          try {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' as never }],
+            });
+            console.log('✅ Navigation to Home completed');
+          } catch (error) {
+            console.error('❌ Navigation error:', error);
+          }
+        });
       } else if (!isAuthenticated && prevAuthState.current === true) {
         // User just logged out - navigate to Login
         // Only reset if user was previously authenticated
         console.log('✅ User logged out - navigating to Login');
-        try {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' as never }],
-          });
-          console.log('✅ Navigation to Login completed');
-        } catch (error) {
-          console.error('❌ Navigation error:', error);
-        }
+        requestAnimationFrame(() => {
+          try {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' as never }],
+            });
+            console.log('✅ Navigation to Login completed');
+          } catch (error) {
+            console.error('❌ Navigation error:', error);
+          }
+        });       
       }
       
       prevAuthState.current = isAuthenticated;
@@ -87,7 +102,12 @@ const Routes = () => {
         isNavigating.current = false;
       }, 300);
     }
-  }, [isAuthenticated, navigation]);
+  }, [isAuthenticated, navigation, isCheckingToken]);
+
+  //if we are checking secure store, render
+  if (isCheckingToken) {
+    return null;
+  }
 
   return(
     <Stack.Navigator 
@@ -120,7 +140,14 @@ const Routes = () => {
         name='Play'
         component={PlayScreen}
         options={({ route }) => ({
-        animation: route.params?.from === "Home" ? "slide_from_bottom" : "default",
+        animation: "default",
+        })}
+      />
+      <Stack.Screen
+        name='CabSelect'
+        component={CabSelectionScreen}
+        options={({ route }) => ({
+        animation: 'slide_from_bottom',
         })}
       />
     </Stack.Navigator>);
@@ -130,6 +157,7 @@ const Routes = () => {
 export type HomeProps = NativeStackScreenProps<StackParamList, 'Home', 'Stack'>;
 export type PrizeProps = NativeStackScreenProps<StackParamList, 'Prize', 'Stack'>;
 export type ShopProps = NativeStackScreenProps<StackParamList, 'Shop', 'Stack'>;
+export type CabSelectProps = NativeStackScreenProps<StackParamList, 'CabSelect', 'Stack'>;
 export type LoginProps = NativeStackScreenProps<StackParamList, 'Login', 'Stack'>;
 export type ProfileProps = NativeStackScreenProps<StackParamList, 'Profile', 'Stack'>;
 export type PlayProps = NativeStackScreenProps<StackParamList, 'Play', 'Stack'>;
