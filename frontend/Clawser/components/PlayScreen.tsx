@@ -9,10 +9,12 @@ import HeaderBar from "./HeaderBar";
 
 
 const {width} = Dimensions.get("window");
-const STREAM_URL = "http://34.174.255.99:8889/test";
 
+const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
-const PlayScreen: React.FC<PlayProps> = ({ navigation }) => {
+  const { cab } = route.params;
+  const STREAM_URL = "http://34.174.255.99:8889/" + cab;
+ 
   return (
       <Background>
         <HeaderBar/>
