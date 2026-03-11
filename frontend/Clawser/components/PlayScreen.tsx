@@ -1,11 +1,11 @@
-import React from "react";
+import React, { use , useEffect} from "react";
 import { ImageBackground, Pressable } from "react-native";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
 import Background from "./Background";
 import HeaderBar from "./HeaderBar";
-
+import useWebsocketStore from "../stores/WebsocketStore";
 
 
 const {width} = Dimensions.get("window");
@@ -14,7 +14,13 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
   const { cab } = route.params;
   const STREAM_URL = "http://34.174.255.99:8889/" + cab;
+  const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab
+  const connect = useWebsocketStore((state) => state.connectToServer); // Accessing the blank function to trigger the WebSocket connection
  
+  useEffect(() => {
+      connect(WS_URL);
+    }, []);
+
   return (
       <Background>
         <HeaderBar/>

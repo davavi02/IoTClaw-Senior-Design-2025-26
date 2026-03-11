@@ -67,7 +67,6 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
         return;
       }
 
-      // In some environments this may still be Blob if binaryType differs.
       console.log('Unknown message type received:', data);
       set({ lastMessage: null });
     };

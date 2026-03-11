@@ -13,16 +13,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "fonts": ["./assets/fonts/Jersey15-Regular.ttf"],
+    "fonts": [
+      "./assets/fonts/Jersey15-Regular.ttf"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.iotclaw.frontend",
       "infoPlist": {
-        "NSAppTransportSecurity": 
-        {
-            "NSAllowsArbitraryLoads": true
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
         },
-
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
@@ -38,7 +38,12 @@
       }
     },
     "android": {
-      "permissions": ["CAMERA", "RECORD_AUDIO", "ACCESS_NETWORK_STATE", "MODIFY_AUDIO_SETTINGS"],
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "ACCESS_NETWORK_STATE",
+        "MODIFY_AUDIO_SETTINGS"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/claw_icon.png",
         "backgroundColor": "#ffffff"
@@ -50,13 +55,15 @@
         {
           "action": "VIEW",
           "autoVerify": false,
-
           "data": [
             {
               "scheme": "frontend"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "VIEW",
@@ -66,7 +73,10 @@
               "scheme": "com.googleusercontent.apps.973669949194-claasjhgvpu9v9ops7iesps06t57f203"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -78,26 +88,24 @@
       "./app.plugin.js",
       [
         "expo-build-properties",
-      
         {
-          "android": 
-          {
+          "android": {
             "debugSigningConfig": {
-            "storeFile": "../../credentials/debug.keystore",
-            "storePassword": "android",
-            "keyAlias": "androiddebugkey",
-            "keyPassword": "android"
+              "storeFile": "../../credentials/debug.keystore",
+              "storePassword": "android",
+              "keyAlias": "androiddebugkey",
+              "keyPassword": "android"
             }
           }
-        
         }
       ],
       [
         "@react-native-google-signin/google-signin",
         {
-        "iosUrlScheme": "com.googleusercontent.apps.973669949194-qtpfvhlg1df90k37md12phfuru4r7974"
+          "iosUrlScheme": "com.googleusercontent.apps.973669949194-qtpfvhlg1df90k37md12phfuru4r7974"
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }
