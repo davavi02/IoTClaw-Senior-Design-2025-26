@@ -5,7 +5,7 @@ import time
 
 claw = serial.Serial("COM4", 115200)
 
-async def moveClaw(command):
+def moveClaw(command):
     print("Moving claw: ", command)
     if command == 0:
         # Stop

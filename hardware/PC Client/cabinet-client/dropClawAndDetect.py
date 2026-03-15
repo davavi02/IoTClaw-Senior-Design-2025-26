@@ -5,43 +5,51 @@ import numpy as np
 import time
 from moveClaw import moveClaw
 
-async def dropClawAndDetect():
+def dropClawAndDetect(ws, game):
     print("Dropping and Detecting")
-    await moveClaw(5)
+    moveClaw(5)
     time.sleep(6)
-    dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
-    detectorParams = cv.aruco.DetectorParameters()
-    detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
-    cap = cv.VideoCapture(1)
-    if not cap.isOpened():
-        print("Cannot open camera")
-        exit()
-    # Amount of tries to check if a prize is won
-    tries = 3
-    found = 0
-    while tries > 0:
-        ret, frame = cap.read()
-        if not ret:
-            print("Can't receive frame (stream end?). Exiting ...")
-            break
-        marked = frame.copy()
-        marked = cv.flip(marked, 1)
-        corners, ids, rejected = detector.detectMarkers(marked)
-        cv.aruco.drawDetectedMarkers(marked, corners, ids)
-        # cv.imshow('frame', marked)
-        # Save images to files, imshow too slow to load in a window
-        cv.imwrite("test{0}.png".format(tries), marked)
-        time.sleep(1)
-        try:
-            if (np.size(ids, axis=0) == 5):
-                found += 1
-        except:
-            pass
-        tries -= 1
-    cap.release()
+    try:
+        dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
+        detectorParams = cv.aruco.DetectorParameters()
+        detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
+        cap = cv.VideoCapture(1)
+        if not cap.isOpened():
+            print("Cannot open camera")
+            exit()
+        # Amount of tries to check if a prize is won
+        tries = 3
+        found = 0
+        while tries > 0:
+            ret, frame = cap.read()
+            if not ret:
+                print("Can't receive frame (stream end?). Exiting ...")
+                break
+            marked = frame.copy()
+            marked = cv.flip(marked, 1)
+            corners, ids, rejected = detector.detectMarkers(marked)
+            cv.aruco.drawDetectedMarkers(marked, corners, ids)
+            # cv.imshow('frame', marked)
+            # Save images to files, imshow too slow to load in a window
+            cv.imwrite("test{0}.png".format(tries), marked)
+            time.sleep(1)
+            try:
+                if (np.size(ids, axis=0) == 5):
+                    found += 1
+            except:
+                pass
+            tries -= 1
+        cap.release()
+    except Exception:
+        raise Exception
     # Amount of successful checks to determine if won
-    if found == 3:
-        return 1
+    # TODO: Change return to websocket message
     else:
-        return 0
+        game.active = 0
+        if found == 3:
+            print("Prize won")
+            return 1
+        else:
+            print("No prize")
+            return 0
     #cv.destroyAllWindows()
