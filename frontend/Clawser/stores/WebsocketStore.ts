@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import * as SecureStore from 'expo-secure-store';
+
 
 type BinaryMessage = ArrayBuffer | Uint8Array;
 
@@ -9,7 +11,7 @@ interface SocketStore {
     lastMessage: string | ArrayBuffer | null;
     lastError: string | null;
 
-    connectToServer: (URL: string) => void;
+    connectToServer: (URL: string) => Promise<void>;
     disconnect: (code?: number, reason?: string) => void;
 
     sendTextMessage: (message: string) => void;
@@ -25,7 +27,7 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
    lastMessage: null,
     lastError: null,
    
-  connectToServer: () => {
+  connectToServer: async (URL: string) => {
     const { webSocket, isConnected } = get();
 
     if (isConnected || webSocket) {
@@ -33,63 +35,82 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
       return;
     }
 
-    const socket = new WebSocket(WS_URL);
-
-    // This affects how binary messages RECEIVED from the server are exposed.
-    // "arraybuffer" is usually easier to work with than "blob".
-    socket.binaryType = 'arraybuffer';
-
-    socket.onopen = () => {
-      console.log('WebSocket connected');
-      set({
-        webSocket: socket,
-        isConnected: true,
-        lastError: null,
+    try {
+      const savedJwt = await SecureStore.getItemAsync('userJWT');
+        console.log('connectting ws...');
+      
+      const socket = new (WebSocket as any)(URL, undefined, {
+        headers: {
+          'Authorization': `Bearer ${savedJwt}`,
+        },
       });
-    };
 
-    socket.onmessage = (event) => {
-      const data = event.data;
+      // This affects how binary messages RECEIVED from the server are exposed.
+      // "arraybuffer" is usually easier to work with than "blob".
+      socket.binaryType = 'arraybuffer';
 
-      if (typeof data === 'string') {
-        console.log('Text message received:', data);
-        set({ lastMessage: data });
-        return;
-      }
+      socket.onopen = () => {
+        console.log('WebSocket connected');
+        set({
+          webSocket: socket,
+          isConnected: true,
+          lastError: null,
+        });
+      };
 
-      if (data instanceof ArrayBuffer) {
-        console.log('Binary message received (ArrayBuffer):', data.byteLength, 'bytes');
-        set({ lastMessage: data });
+      socket.onmessage = (event) => {
+        const data = event.data;
 
-        // Example: inspect received bytes
-        const bytes = new Uint8Array(data);
-        console.log('Received bytes:', bytes);
-        return;
-      }
+        if (typeof data === 'string') {
+          console.log('Text message received:', data);
+          set({ lastMessage: data });
+          return;
+        }
 
-      console.log('Unknown message type received:', data);
-      set({ lastMessage: null });
-    };
+        if (data instanceof ArrayBuffer) {
+          console.log('Binary message received (ArrayBuffer):', data.byteLength, 'bytes');
+          set({ lastMessage: data });
 
-    socket.onerror = (event) => {
-      console.log('WebSocket error:', event);
-      set({ lastError: 'WebSocket error occurred' });
-    };
+          // Example: inspect received bytes
+          const bytes = new Uint8Array(data);
+          console.log('Received bytes:', bytes);
+          return;
+        }
 
-    socket.onclose = (event) => {
-      console.log('Connection closed. Code:', event.code);
-      console.log('Reason closed:', event.reason);
+        console.log('Unknown message type received:', data);
+        set({ lastMessage: null });
+      };
+
+      socket.onerror = (event) => {
+        console.log('WebSocket error:', event);
+        set({ lastError: 'WebSocket error occurred' });
+      };
+
+      socket.onclose = (event) => {
+        console.log('Connection closed. Code:', event.code);
+        console.log('Reason closed:', event.reason);
+
+        set({
+          webSocket: null,
+          isConnected: false,
+          streamUrl: null,
+        });
+      };
+
+      // Optional: set immediately so UI can know a socket exists while connecting.
+      set({ webSocket: socket });
+    }
+    catch {
+      console.log('errrrrrr');
 
       set({
         webSocket: null,
         isConnected: false,
         streamUrl: null,
       });
-    };
-
-    // Optional: set immediately so UI can know a socket exists while connecting.
-    set({ webSocket: socket });
+    }
   },
+  
 
   disconnect: (code = 1000, reason = 'Client disconnect') => {
     const { webSocket } = get();

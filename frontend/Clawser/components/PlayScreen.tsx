@@ -15,10 +15,15 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const { cab } = route.params;
   const STREAM_URL = "http://34.174.255.99:8889/" + cab;
   const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab
-  const connect = useWebsocketStore((state) => state.connectToServer); // Accessing the blank function to trigger the WebSocket connection
+  const connect = useWebsocketStore((state) => state.connectToServer);
+  const disconnect = useWebsocketStore((state) => state.disconnect);
  
   useEffect(() => {
       connect(WS_URL);
+      return () => {
+        console.log("Leaving screen, closing socket...");
+        disconnect(); 
+      };
     }, []);
 
   return (
