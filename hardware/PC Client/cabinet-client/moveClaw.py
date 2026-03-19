@@ -3,11 +3,10 @@
 import serial
 import time
 
-#claw = serial.Serial("COM4", 115200)
+claw = serial.Serial("COM4", 115200)
 
 def moveClaw(command):
     print("Moving claw: ", command)
-    return
     if command == 0:
         # Stop
         claw.write(b"0\n")
