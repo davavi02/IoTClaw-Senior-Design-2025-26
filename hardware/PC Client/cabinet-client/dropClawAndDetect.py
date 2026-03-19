@@ -5,7 +5,7 @@ import numpy as np
 import time
 from moveClaw import moveClaw
 
-def dropClawAndDetect(ws, game):
+def dropClawAndDetect(messages, game):
     print("Dropping and Detecting")
     moveClaw(5)
     time.sleep(6)
@@ -13,7 +13,7 @@ def dropClawAndDetect(ws, game):
         dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
         detectorParams = cv.aruco.DetectorParameters()
         detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
-        cap = cv.VideoCapture(1)
+        cap = cv.VideoCapture(2)
         if not cap.isOpened():
             print("Cannot open camera")
             exit()
@@ -48,8 +48,8 @@ def dropClawAndDetect(ws, game):
         game.active = 0
         if found == 3:
             print("Prize won")
-            return 1
+            messages.put(1)
         else:
             print("No prize")
-            return 0
+            messages.put(0)
     #cv.destroyAllWindows()
