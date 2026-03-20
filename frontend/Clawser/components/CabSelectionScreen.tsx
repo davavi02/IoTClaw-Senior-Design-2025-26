@@ -44,6 +44,8 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
           method: 'GET' 
       });
 
+      
+
       console.log("Server Status Code:", response.status);
 
       if (response.ok){
