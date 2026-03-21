@@ -14,6 +14,20 @@ import {
 } from 'react-native';
 import { callProtectedRoute } from '../services/ApiService';
 
+const MOCK_CABINETS: CabinentData[] = 
+  [
+  {
+    name: 'Test Cabinet 1',
+    cost: 20,
+    description: 'This is a test cabinet. It does not do anything, but it is very fun to look at! Please play it and give us feedback on how to make it better :)',
+  },
+  {
+    name: 'Test Cabinet 2',
+    cost: 20,
+    description: 'Test Cabinet numero dos',
+  },
+  ];
+
 /// ======= 4: Add the props {route, navigation}: TYPE you exported in #3. Don't forget to import at top. 
 /// =======    Congrats for following my example in Routes.tsx, pat your self on the back.
 const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
@@ -32,6 +46,7 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
   const playCabinent = (title: string) => {
     navigation.navigate('Play', { cab: title });
   }
+
 
   //Get the cabinent data.
   const getCabData = async () => {
@@ -56,8 +71,8 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
           setCabinents(data.games);
           setLoading(false);
         } else {
-          console.log("Server returned an empty cabinents array");
-          setEmpty(true);
+          console.log("No real cabinets found, falling back to mock cabinets");
+          setCabinents(MOCK_CABINETS);
           setLoading(false);
         }
       } else {

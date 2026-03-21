@@ -104,41 +104,56 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
         ) : null}
       </View>
 
-      <View style={styles.container}>
-        <Pressable style={styles.controlButton} onPressIn={handleMoveUp} onPressOut={cancelMove}>
+    <View style={styles.controlsOverlay}>
+      <View style={styles.dpad}>
+        <Pressable
+          style={[styles.controlButton, styles.upButton]}
+          onPressIn={handleMoveUp}
+          onPressOut={cancelMove}
+        >
           <Text style={styles.buttonText}>Up</Text>
         </Pressable>
 
-        <Pressable style={styles.controlButton} onPressIn={coinButton}>
-          <Text style={styles.buttonText}>Coin</Text>
-        </Pressable>
+        <View style={styles.middleRow}>
+          <Pressable
+            style={styles.controlButton}
+            onPressIn={handleMoveLeft}
+            onPressOut={cancelMove}
+          >
+            <Text style={styles.buttonText}>Left</Text>
+          </Pressable>
 
-        <Pressable style={styles.controlButton} onPressIn={handleMoveDown} onPressOut={cancelMove}>
+          <View style={styles.dpadCenter} />
+
+          <Pressable
+            style={styles.controlButton}
+            onPressIn={handleMoveRight}
+            onPressOut={cancelMove}
+          >
+            <Text style={styles.buttonText}>Right</Text>
+          </Pressable>
+        </View>
+
+        <Pressable
+          style={[styles.controlButton, styles.downButton]}
+          onPressIn={handleMoveDown}
+          onPressOut={cancelMove}
+        >
           <Text style={styles.buttonText}>Down</Text>
         </Pressable>
-
-        <Pressable style={styles.controlButton} onPressIn={handleMoveLeft} onPressOut={cancelMove}>
-          <Text style={styles.buttonText}>Left</Text>
-        </Pressable>
-
-        <Pressable style={styles.controlButton} onPressIn={handleMoveRight} onPressOut={cancelMove}>
-          <Text style={styles.buttonText}>Right</Text>
-        </Pressable>
-
       </View>
+
+      <Pressable style={styles.coinButton} onPressIn={coinButton}>
+        <Text style={styles.buttonText}>Coin</Text>
+      </Pressable>
+    </View>
+      
     </Background>)
 };
 
 export default PlayScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 12,
-  },
-
   backButton: {
     position: "absolute",
     top: 20,
@@ -185,12 +200,60 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
+  controlsOverlay: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    paddingHorizontal: 24,
+    paddingBottom: 30,
+  },
+
+  dpad: {
+    width: 235,
+    alignItems: "center",
+  },
+
+  middleRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+
+  dpadCenter: {
+    width: 50,
+    height: 50,
+  },
+
   controlButton: {
-    marginTop: 20,
-    paddingVertical: 10,
+    minWidth: 80,
+    paddingVertical: 25,
     paddingHorizontal: 20,
     backgroundColor: "#007AFF",
-    borderRadius: 5,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  upButton: {
+    alignSelf: "center",
+  },
+
+  downButton: {
+    alignSelf: "center",
+  },
+
+  coinButton: {
+    width: 85,
+    height: 85,
+    borderRadius: 40,
+    backgroundColor: "#FFB000",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
   },
 
   buttonText: {
@@ -198,13 +261,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+});
 
-    coinButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
-    borderRadius: 5,
-  },
-}
-);
