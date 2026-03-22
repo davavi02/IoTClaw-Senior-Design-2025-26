@@ -5,6 +5,11 @@ import (
 	"database/sql"
 )
 
+func UpdateUserDisplayName(ctx context.Context, trx *sql.Tx, uid int64, name string) error {
+	_, err := trx.ExecContext(ctx, `UPDATE GoogleUser SET Name = ? WHERE UID = ?`, name, uid)
+	return err
+}
+
 type UserData struct {
 	DatabaseUID int64  `json:"-"`
 	GoogleID    string `json:"-"`

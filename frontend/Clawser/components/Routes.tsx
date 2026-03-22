@@ -6,6 +6,9 @@ import ShopScreen from './ShopScreen';
 import PrizeScreen from './PrizeScreen';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
+import EditProfileScreen from './EditProfileScreen';
+import ReportErrorScreen from './ReportErrorScreen';
+import PrizeTrackingScreen from './PrizeTrackingScreen';
 import PlayScreen from './PlayScreen';
 import CabSelectionScreen from './CabSelectionScreen';
 import { useAuthStore } from '../stores/AuthStore';
@@ -24,6 +27,9 @@ type StackParamList = {
   Login: { from?: string };
   Prize: { from?: string };
   Profile: { from?: string };
+  EditProfile: undefined;
+  ReportError: undefined;
+  PrizeTracking: undefined;
   Play: { cab: string };
   CabSelect: undefined;
 };
@@ -130,6 +136,27 @@ const Routes = () => {
       <Stack.Screen name='Login' component={LoginScreen}></Stack.Screen>
       <Stack.Screen name='Profile' component={ProfileScreen}></Stack.Screen>
       <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="ReportError"
+        component={ReportErrorScreen}
+        options={{
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="PrizeTracking"
+        component={PrizeTrackingScreen}
+        options={{
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
         name='Prize'
         component={PrizeScreen}
         options={({ route }) => ({
@@ -160,6 +187,9 @@ export type ShopProps = NativeStackScreenProps<StackParamList, 'Shop', 'Stack'>;
 export type CabSelectProps = NativeStackScreenProps<StackParamList, 'CabSelect', 'Stack'>;
 export type LoginProps = NativeStackScreenProps<StackParamList, 'Login', 'Stack'>;
 export type ProfileProps = NativeStackScreenProps<StackParamList, 'Profile', 'Stack'>;
+export type EditProfileProps = NativeStackScreenProps<StackParamList, 'EditProfile', 'Stack'>;
+export type ReportErrorProps = NativeStackScreenProps<StackParamList, 'ReportError', 'Stack'>;
+export type PrizeTrackingProps = NativeStackScreenProps<StackParamList, 'PrizeTracking', 'Stack'>;
 export type PlayProps = NativeStackScreenProps<StackParamList, 'Play', 'Stack'>;
 
 

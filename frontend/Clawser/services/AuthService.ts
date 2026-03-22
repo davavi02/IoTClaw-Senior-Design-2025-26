@@ -1,5 +1,12 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
+export interface UserInfo {
+  email: string;
+  name: string;
+  picture?: string;
+  tokens?: number;
+}
+
 class AuthService {
   constructor() {
     GoogleSignin.configure({

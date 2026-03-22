@@ -50,7 +50,32 @@ CREATE TABLE UserAddress(
   FOREIGN KEY (UID) REFERENCES GoogleUser(UID) ON DELETE CASCADE
 );
 
-//Prize History??????? Whatever the thing Jeff made was, I like the idea
-CREATE TABLE PrizeHistory(
-  //Waiting for replys..
+//Prize History — placeholder (use UserPrize for app Prize Tracking)
+// CREATE TABLE PrizeHistory( ... );
+
+// Shipped / physical prizes per user (Prize Tracking screen + GET /api/prizes)
+CREATE TABLE UserPrize (
+  PID INT AUTO_INCREMENT PRIMARY KEY,
+  UID INT NOT NULL,
+  Name VARCHAR(255) NOT NULL,
+  Description TEXT,
+  PicUrl TEXT,
+  WonAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  IsShipped TINYINT(1) NOT NULL DEFAULT 0,
+  IsDelivered TINYINT(1) NOT NULL DEFAULT 0,
+  FOREIGN KEY (UID) REFERENCES GoogleUser(UID) ON DELETE CASCADE
+);
+
+-- Example row (replace UID with a real GoogleUser.UID):
+-- INSERT INTO UserPrize (UID, Name, Description, PicUrl, IsShipped, IsDelivered)
+-- VALUES (1, 'Stuffed Bear', 'Won from Test Cabinet 1', 'https://picsum.photos/seed/bear/200/200', 1, 0);
+
+// User-submitted bug reports / feedback from the app (Report Error screen)
+CREATE TABLE ErrorReport (
+  RID INT AUTO_INCREMENT PRIMARY KEY,
+  UID INT NOT NULL,
+  Subject VARCHAR(200) NOT NULL,
+  Message TEXT NOT NULL,
+  CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (UID) REFERENCES GoogleUser(UID) ON DELETE CASCADE
 );

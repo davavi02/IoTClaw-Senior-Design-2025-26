@@ -59,6 +59,7 @@ func (server *Server) createRoutes() bool {
 	//These are protected by our jwts
 	apiRoute := server.router.PathPrefix("/api").Subrouter()
 	apiRoute.HandleFunc("/profile", server.getProfileData).Methods("GET")
+	apiRoute.HandleFunc("/profile", server.updateProfileData).Methods("POST")
 	apiRoute.HandleFunc("/tokens", server.handleGetTokens).Methods("GET")
 	apiRoute.HandleFunc("/join/{game}", server.handleJoinRoom).Methods("GET")
 	apiRoute.HandleFunc("/games", server.handleGetGames).Methods("GET")
@@ -66,6 +67,8 @@ func (server *Server) createRoutes() bool {
 	apiRoute.HandleFunc("/address", server.handleGetAddress).Methods("GET")
 	apiRoute.HandleFunc("/address", server.handleUpdateAddress).Methods("POST")
 	apiRoute.HandleFunc("/buy/{id}", server.handleBuyProduct).Methods("POST")
+	apiRoute.HandleFunc("/report-error", server.handleReportError).Methods("POST")
+	apiRoute.HandleFunc("/prizes", server.handleGetPrizes).Methods("GET")
 	apiRoute.Use(authCheckMiddleware)
 
 	return true
@@ -220,6 +223,173 @@ func (server *Server) getProfileData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Issue creating responce.", http.StatusInternalServerError)
 		return
 	}
+}
+
+type updateProfileBody struct {
+	Name string `json:"name"`
+}
+
+func (server *Server) updateProfileData(w http.ResponseWriter, r *http.Request) {
+	tokenString := getAuthHeaderToken(w, r)
+	if tokenString == "" {
+		http.Error(w, "Auth must be in format 'Bearer -tokenhere-'.", http.StatusUnauthorized)
+		return
+	}
+
+	jwtData := getJwtData(tokenString)
+	if jwtData == nil {
+		http.Error(w, "Authorization failed.", http.StatusUnauthorized)
+		return
+	}
+
+	var body updateProfileBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	name := strings.TrimSpace(body.Name)
+	if name == "" || len(name) > 120 {
+		http.Error(w, "Name must be 1–120 characters", http.StatusBadRequest)
+		return
+	}
+
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	if err := UpdateUserDisplayName(r.Context(), trx, uid, name); err != nil {
+		http.Error(w, "Issue updating profile.", http.StatusInternalServerError)
+		return
+	}
+
+	userProfile, err := GetUserDataFromDatabaseByUID(r.Context(), trx, uid)
+	if err != nil || userProfile == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	if err = trx.Commit(); err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(userProfile); err != nil {
+		http.Error(w, "Issue creating responce.", http.StatusInternalServerError)
+		return
+	}
+}
+
+type reportErrorBody struct {
+	Subject string `json:"subject"`
+	Message string `json:"message"`
+}
+
+func (server *Server) handleReportError(w http.ResponseWriter, r *http.Request) {
+	tokenString := getAuthHeaderToken(w, r)
+	if tokenString == "" {
+		http.Error(w, "Auth must be in format 'Bearer -tokenhere-'.", http.StatusUnauthorized)
+		return
+	}
+
+	jwtData := getJwtData(tokenString)
+	if jwtData == nil {
+		http.Error(w, "Authorization failed.", http.StatusUnauthorized)
+		return
+	}
+
+	var body reportErrorBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	message := strings.TrimSpace(body.Message)
+	if len(message) < 5 {
+		http.Error(w, "Message must be at least 5 characters", http.StatusBadRequest)
+		return
+	}
+	if len(message) > 4000 {
+		http.Error(w, "Message too long (max 4000 characters)", http.StatusBadRequest)
+		return
+	}
+
+	subject := strings.TrimSpace(body.Subject)
+	if subject == "" {
+		subject = "General"
+	}
+	if len(subject) > 200 {
+		http.Error(w, "Subject too long (max 200 characters)", http.StatusBadRequest)
+		return
+	}
+
+	trx, err := server.dbMan.BeginTransaction(r.Context())
+	if err != nil || trx == nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+	defer trx.Rollback()
+
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	if err := InsertErrorReport(r.Context(), trx, uid, subject, message); err != nil {
+		http.Error(w, "Could not save report. Ensure ErrorReport table exists (see DBSChema/Setup.txt).", http.StatusInternalServerError)
+		return
+	}
+
+	if err = trx.Commit(); err != nil {
+		http.Error(w, "Issue with database.", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(`{"ok":true}`))
+}
+
+func (server *Server) handleGetPrizes(w http.ResponseWriter, r *http.Request) {
+	tokenString := getAuthHeaderToken(w, r)
+	if tokenString == "" {
+		http.Error(w, "Auth must be in format 'Bearer -tokenhere-'.", http.StatusUnauthorized)
+		return
+	}
+
+	jwtData := getJwtData(tokenString)
+	if jwtData == nil {
+		http.Error(w, "Authorization failed.", http.StatusUnauthorized)
+		return
+	}
+
+	uid, err := jwtData.GetUserIdAsInt64()
+	if err != nil {
+		http.Error(w, "Issue with uids.", http.StatusInternalServerError)
+		return
+	}
+
+	prizes, err := GetUserPrizesForUID(r.Context(), server.dbMan.db, uid)
+	if err != nil {
+		http.Error(w, "Issue loading prizes. Ensure UserPrize table exists (see DBSChema/Setup.txt).", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string][]UserPrizeJSON{"prizes": prizes})
 }
 
 func (server *Server) handleCreateGameRoom(w http.ResponseWriter, r *http.Request) {

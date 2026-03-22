@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AuthService, { UserInfo } from '../services/AuthService';
+import { callProtectedRoute } from '../services/ApiService';
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import useUserDataStore from './UserDataStore';
@@ -16,6 +17,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   clearError: () => void;
   checkSavedToken: () => Promise<void>;
+  updateDisplayName: (name: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -143,6 +145,52 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearError: () => {
     set({ error: null });
+  },
+
+  updateDisplayName: async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return { ok: false as const, error: 'Name is required' };
+    }
+    try {
+      const response = await callProtectedRoute('/api/profile', {
+        method: 'POST',
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        return {
+          ok: false as const,
+          error: text || `Could not update profile (${response.status})`,
+        };
+      }
+      const data = (await response.json()) as {
+        name: string;
+        email: string;
+        profilePic: string;
+        tokens: number;
+      };
+      const prev = get().user;
+      if (!prev) {
+        return { ok: false as const, error: 'Not signed in' };
+      }
+      set({
+        user: {
+          ...prev,
+          name: data.name,
+          email: data.email,
+          picture: data.profilePic,
+          tokens: data.tokens,
+        },
+      });
+      useUserDataStore.getState().setUserData(data.name, data.tokens);
+      return { ok: true as const };
+    } catch (e) {
+      return {
+        ok: false as const,
+        error: e instanceof Error ? e.message : 'Network error',
+      };
+    }
   },
 }));
 

@@ -59,7 +59,10 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
 
             {/* CYAN ACTION BUTTONS */}
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
                 <Text style={styles.actionButtonText}>Edit Profile</Text>
               </TouchableOpacity>
 
@@ -67,11 +70,17 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
                 <Text style={styles.actionButtonText}>Edit Address</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('ReportError')}
+              >
                 <Text style={styles.actionButtonText}>Report Error</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('PrizeTracking')}
+              >
                 <Text style={styles.actionButtonText}>Prize Tracking</Text>
               </TouchableOpacity>
 
