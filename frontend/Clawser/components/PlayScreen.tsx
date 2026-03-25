@@ -90,19 +90,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
         </View>
       </View>
 
-      <View style={styles.statusWrap}>
-        <Text style={styles.statusText}>
-          Status: {isConnected ? "Connected" : "Disconnected"}
-        </Text>
 
-        {lastError ? (
-          <Text style={styles.statusText}>Error: {lastError}</Text>
-        ) : null}
-
-        {typeof lastMessage === "string" ? (
-          <Text style={styles.statusText}>Last Message: {lastMessage}</Text>
-        ) : null}
-      </View>
 
     <View style={styles.controlsOverlay}>
       <View style={styles.dpad}>
@@ -172,12 +160,13 @@ const styles = StyleSheet.create({
 
   streamWrap: {
     alignItems: "center",
-    marginTop: 100,
+    marginTop:30,
   },
 
   streamFrame: {
-    width: Math.min(width, 420),
-    aspectRatio: 16 / 9,
+    width: (420),
+    height:(400),
+    aspectRatio: 3 / 4,
     borderRadius: 12,
     overflow: "hidden",
     borderWidth: 3,
@@ -206,7 +195,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 30,
   },
 
@@ -230,7 +219,7 @@ const styles = StyleSheet.create({
 
   controlButton: {
     minWidth: 80,
-    paddingVertical: 25,
+    paddingVertical: 20,
     paddingHorizontal: 20,
     backgroundColor: "#007AFF",
     borderRadius: 10,
