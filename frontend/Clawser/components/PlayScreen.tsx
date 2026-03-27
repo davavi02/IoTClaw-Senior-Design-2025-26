@@ -55,9 +55,14 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
       sendBytes([0]);
     };
 
-    const coinButton = () => {
+    const queueButton = () => {
     if (!isConnected) return;
-    sendBytes([7]);
+    sendBytes([200]);
+    };
+
+    const dropButton = () => {
+    if (!isConnected) return;
+    sendBytes([5]);
     };
 
   return (
@@ -131,8 +136,12 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
         </Pressable>
       </View>
 
-      <Pressable style={styles.coinButton} onPressIn={coinButton}>
-        <Text style={styles.buttonText}>Coin</Text>
+      <Pressable style={styles.queueButton} onPressIn={queueButton}>
+        <Text style={styles.buttonText}>Queue</Text>
+      </Pressable>
+
+      <Pressable style={styles.dropButton} onPressIn={dropButton}>
+        <Text style={styles.buttonText}>Drop</Text>
       </Pressable>
     </View>
       
@@ -235,14 +244,28 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 
-  coinButton: {
+  queueButton: {
     width: 85,
     height: 85,
     borderRadius: 40,
     backgroundColor: "#FFB000",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    position: "absolute",
+    bottom: 140,
+    right: 20,
+  },
+
+  dropButton: {
+    width: 85,
+    height: 85,
+    borderRadius: 40,
+    backgroundColor: "#FFB000",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 25,
+    right: 20,
   },
 
   buttonText: {
