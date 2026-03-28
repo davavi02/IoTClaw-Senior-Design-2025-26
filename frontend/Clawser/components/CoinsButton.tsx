@@ -1,4 +1,4 @@
-import React from 'react';
+ import React from 'react';
 import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import coinIcon from '../assets/coin.png';
@@ -21,7 +21,7 @@ export default function CoinsButton({onPress }: Props) {
         {/* Spacer that forces + to right */}
         <View style={{ flex: 1 }} />
 
-        <Ionicons name="add-circle-outline" size={22} color="#fff" />
+        <Ionicons name="add-circle-outline" size={25} color="#fff" />
       </View>
     </TouchableOpacity>
   );

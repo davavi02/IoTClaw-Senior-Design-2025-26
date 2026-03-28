@@ -1,161 +1,171 @@
-import React, { use , useEffect} from "react";
-import { ImageBackground, Pressable } from "react-native";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import React, { useEffect } from "react";
+import {
+  ImageBackground,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
 import Background from "./Background";
 import HeaderBar from "./HeaderBar";
 import useWebsocketStore from "../stores/WebsocketStore";
+import PlayDirectionalButtons from "./PlayDirectionalButtons";
+import DropClawButton from "./DropClawButton";
+import arcadeMachine from "../assets/ArcadeBackground.png";
 
-
-const {width} = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
-
   const { cab } = route.params;
   const STREAM_URL = "http://video-server.babid.net:8889/" + cab;
-  const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab
+  const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab;
+
   const connect = useWebsocketStore((state) => state.connectToServer);
   const disconnect = useWebsocketStore((state) => state.disconnect);
-  const sendTextMessage = useWebsocketStore((state) => state.sendBinaryMessage);
   const sendBytes = useWebsocketStore((state) => state.sendBytes);
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const lastMessage = useWebsocketStore((state) => state.lastMessage);
   const lastError = useWebsocketStore((state) => state.lastError);
- 
-  useEffect(() => {
-      connect(WS_URL);
-      return () => {
-        console.log("Leaving screen, closing socket...");
-        disconnect(); 
-      };
-    }, [WS_URL, connect, disconnect]);
 
-    const handleMoveUp = () => {
+  useEffect(() => {
+    connect(WS_URL);
+
+    return () => {
+      console.log("Leaving screen, closing socket...");
+      disconnect();
+    };
+  }, [WS_URL, connect, disconnect]);
+
+  const handleMoveUp = () => {
     if (!isConnected) return;
     sendBytes([1]);
-    };
+  };
 
-    const handleMoveDown = () => {
-      if (!isConnected) return;
-      sendBytes([2]);
-    };
-
-    const handleMoveLeft = () => {
-      if (!isConnected) return;
-      sendBytes([3]);
-    };
-
-    const handleMoveRight = () => {
-      if (!isConnected) return;
-      sendBytes([4]);
-    };
-    const cancelMove = () => {
-      if (!isConnected) return;
-      sendBytes([0]);
-    };
-
-    const queueButton = () => {
+  const handleMoveDown = () => {
     if (!isConnected) return;
-    sendBytes([200]);
-    };
+    sendBytes([2]);
+  };
 
-    const dropButton = () => {
+  const handleMoveLeft = () => {
     if (!isConnected) return;
-    sendBytes([5]);
-    };
+    sendBytes([3]);
+  };
+
+  const handleMoveRight = () => {
+    if (!isConnected) return;
+    sendBytes([4]);
+  };
+
+  const cancelMove = () => {
+    if (!isConnected) return;
+    sendBytes([0]);
+  };
+
+  const coinButton = () => {
+    if (!isConnected) return;
+    sendBytes([7]);
+  };
 
   return (
     <Background>
-      <HeaderBar />
-
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backText}>Back</Text>
-      </TouchableOpacity>
-
-      <View style={styles.streamWrap}>
-        <View style={styles.streamFrame}>
-          <WebView
-            source={{ uri: STREAM_URL }}
-            style={styles.webview}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            allowsInlineMediaPlayback={true}
-            mediaPlaybackRequiresUserAction={false}
-            originWhitelist={["*"]}
-            mixedContentMode="always"
-            onError={(syntheticEvent) => {
-              const { nativeEvent } = syntheticEvent;
-              console.warn("WebView error: ", nativeEvent);
-            }}
-          />
-        </View>
-      </View>
-
-
-
-    <View style={styles.controlsOverlay}>
-      <View style={styles.dpad}>
-        <Pressable
-          style={[styles.controlButton, styles.upButton]}
-          onPressIn={handleMoveUp}
-          onPressOut={cancelMove}
-        >
-          <Text style={styles.buttonText}>Up</Text>
-        </Pressable>
-
-        <View style={styles.middleRow}>
-          <Pressable
-            style={styles.controlButton}
-            onPressIn={handleMoveLeft}
-            onPressOut={cancelMove}
-          >
-            <Text style={styles.buttonText}>Left</Text>
-          </Pressable>
-
-          <View style={styles.dpadCenter} />
-
-          <Pressable
-            style={styles.controlButton}
-            onPressIn={handleMoveRight}
-            onPressOut={cancelMove}
-          >
-            <Text style={styles.buttonText}>Right</Text>
-          </Pressable>
+      <View style={styles.container}>
+        <View style={styles.headerOverlay}>
+          <HeaderBar />
         </View>
 
-        <Pressable
-          style={[styles.controlButton, styles.downButton]}
-          onPressIn={handleMoveDown}
-          onPressOut={cancelMove}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonText}>Down</Text>
-        </Pressable>
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+
+        <View style={styles.mainArea}>
+          <View style={styles.machineArea}>
+            {/* Bottom layer: stream */}
+            <View style={styles.streamWrap}>
+              <View style={styles.streamFrame}>
+                <WebView
+                  source={{ uri: STREAM_URL }}
+                  style={styles.webview}
+                  javaScriptEnabled
+                  domStorageEnabled
+                  allowsInlineMediaPlayback
+                  mediaPlaybackRequiresUserAction={false}
+                  originWhitelist={["*"]}
+                  mixedContentMode="always"
+                  onError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn("WebView error: ", nativeEvent);
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* Middle layer: arcade background */}
+            <View style={styles.arcadeOverlay}>
+              <Image source={arcadeMachine} style={styles.arcadeImage} />
+            </View>
+
+            {/* Top layer: controls */}
+            <View style={styles.controlsContainer}>
+              <View style={styles.controlsOverlay}>
+                <View style={styles.dropButtonWrap}>
+                  <DropClawButton onPress={coinButton} size={width*0.3} />
+                </View>
+
+                <View style={styles.directionalButtonsWrap}>
+                  <PlayDirectionalButtons
+                    pressUp={handleMoveUp}
+                    pressDown={handleMoveDown}
+                    pressLeft={handleMoveLeft}
+                    pressRight={handleMoveRight}
+                    cancelMove={cancelMove}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.statusWrap}>
+            {lastError ? (
+              <Text style={styles.statusText}>Error: {lastError}</Text>
+            ) : null}
+
+            {typeof lastMessage === "string" ? (
+              <Text style={styles.statusText}>Last Message: {lastMessage}</Text>
+            ) : null}
+          </View>
+        </View>
       </View>
-
-      <Pressable style={styles.queueButton} onPressIn={queueButton}>
-        <Text style={styles.buttonText}>Queue</Text>
-      </Pressable>
-
-      <Pressable style={styles.dropButton} onPressIn={dropButton}>
-        <Text style={styles.buttonText}>Drop</Text>
-      </Pressable>
-    </View>
-      
-    </Background>)
+    </Background>
+  );
 };
 
 export default PlayScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  headerOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 40,
+  },
+
   backButton: {
     position: "absolute",
     top: 20,
     left: 20,
-    zIndex: 10,
+    zIndex: 50,
     backgroundColor: "#000",
     paddingHorizontal: 15,
     paddingVertical: 5,
@@ -167,111 +177,100 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  streamWrap: {
+  mainArea: {
+    flex: 1,
     alignItems: "center",
-    marginTop:30,
+    justifyContent: "flex-start",
+    paddingTop: 0,
+  },
+
+  machineArea: {
+    position: "relative",
+    width: width,
+    height: Math.min(height * 0.75, 760),
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+
+  streamWrap: {
+    position: "absolute",
+    top: 100,
+    alignItems: "center",
+    zIndex: 1,
   },
 
   streamFrame: {
-    width: (420),
-    height:(400),
-    aspectRatio: 3 / 4,
+    width: Math.min(width * 0.8, 420),
+    aspectRatio: 100 / 135,
+    top: 30,
     borderRadius: 12,
     overflow: "hidden",
-    borderWidth: 3,
-    borderColor: "rgba(0, 229, 255, 0.96)",
+    backgroundColor: "#000",
+    zIndex: 2,
   },
 
   webview: {
     width: "100%",
     height: "100%",
   },
+  
+  arcadeOverlay: {
+    position: "absolute",
+    top: 0,
+    flex: 1,
+    width: "100%",
+    height: Math.min(height * 0.89, 1760),
+    zIndex: 5,
+  },
+
+  arcadeImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "stretch",
+  },
+
+  controlsContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: height * 0.66,
+    width: width,
+    zIndex: 10,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  controlsOverlay: {
+    width: width * 0.8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  directionalButtonsWrap: {
+
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  dropButtonWrap: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
 
   statusWrap: {
-    alignItems: "center",
     marginTop: 16,
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
 
   statusText: {
     color: "white",
     fontSize: 16,
     marginTop: 4,
-  },
-
-  controlsOverlay: {
-    flex: 1,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
-
-  dpad: {
-    width: 235,
-    alignItems: "center",
-  },
-
-  middleRow: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-
-  dpadCenter: {
-    width: 50,
-    height: 50,
-  },
-
-  controlButton: {
-    minWidth: 80,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    backgroundColor: "#007AFF",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  upButton: {
-    alignSelf: "center",
-  },
-
-  downButton: {
-    alignSelf: "center",
-  },
-
-  queueButton: {
-    width: 85,
-    height: 85,
-    borderRadius: 40,
-    backgroundColor: "#FFB000",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    bottom: 140,
-    right: 20,
-  },
-
-  dropButton: {
-    width: 85,
-    height: 85,
-    borderRadius: 40,
-    backgroundColor: "#FFB000",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    bottom: 25,
-    right: 20,
-  },
-
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    textAlign: "center",
   },
 });
-
