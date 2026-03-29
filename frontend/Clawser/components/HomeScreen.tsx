@@ -16,7 +16,7 @@ import ClawMachine from '../assets/HomeScreenClaw.png';
 import { ImageBackground } from "react-native";
 import Pxbkg from "../assets/pixbkg.png";
 import PlayButton from "../assets/PlayButton.png";
-import CoinsButton from '../components/CoinsButton.tsx';
+import CoinsButton from '../components/CoinsButton';
 import Background from './Background';
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
@@ -47,15 +47,17 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             <View style={styles.clawWrapper}>
               <Image source={ClawMachine} style={styles.clawImage} />
             </View>
-            <TouchableOpacity style = {styles.playButtonWrapper}
-                  onPress={() => navigation.navigate("CabSelect")}
-                    >
-                <View>
-                    <Image source={PlayButton} style={styles.playButtonImage} />
-                    <Text style = {styles.playButtonPlayText}>Play</Text>
-                    <Text style = {styles.playButtonCostText}>10 Tokens</Text>
-                </View>
-            </TouchableOpacity>
+            <View style={styles.playButtonWrapper}>
+              <TouchableOpacity style = {styles.playButtonContainer}
+                    onPress={() => navigation.navigate("CabSelect")}
+                      >
+                  <View style = {{borderWidth: 3, borderColor: "#b7ff00ff"}}>
+                      <Image source={PlayButton} style={styles.playButtonImage} />
+                      <Text style = {styles.playButtonPlayText}>Play</Text>
+                      <Text style = {styles.playButtonCostText}>10 Tokens</Text>
+                  </View>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* FIXED BOTTOM NAVBAR */}
@@ -151,42 +153,53 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
 
-    playButtonWrapper: {
-        flex: 1,
-        justifyContent: "flex-start",  // push claw to the bottom of main
-        alignItems: "center",        // center horizontally
-        paddingTop: 150,            // space above navbar
-      },
+  playButtonWrapper: {
+    borderWidth: 3,
+    borderColor: "#FF003C",
+    justifyContent: "flex-end",  // push claw to the bottom of main
+    alignItems: "center",        // center horizontally
+    paddingTop: 0,            // space above navbar
+  },
 
-      playButtonImage: {
-          transform: [{scaleX: 1.2}],
-        resizeMode: "contain",
-      },
-    playButtonPlayText: {
-        position: 'absolute',
-        color: "#fff",
-          fontSize: 60,
-          fontWeight: "bold",
-          top: 108,
-          left: 35,
-          zIndex: 4
-    },
-    coinsButton: {
-        position: 'absolute',
-        top: -80,
-        right: 20
-    },
-    playButtonCostText: {
-        position: 'absolute',
-        color: "#fff",
-          fontSize: 20,
-          fontWeight: "bold",
-          top: 180,
-          left: 50,
-          zIndex: 4},
+  // this hold the actual button so the touchable opacity can work 
+  // and not take up the whole screen
+  playButtonContainer: {
+    borderWidth: 3,
+    borderColor: "#ff7b00ff",
+    justifyContent: "flex-start",
+    alignItems: "baseline",
+  },
 
+  playButtonImage: {
+    transform: [{scaleX: 1.2}],
+  },
 
-      }
+  playButtonPlayText: {
+    position: 'absolute',
+    color: "#fff",
+    fontSize: 60,
+    fontWeight: "bold",
+    top: 10,
+    left: 25,
+    zIndex: 4
+  },
+
+  coinsButton: {
+    position: 'absolute',
+    top: -80,
+    right: 20
+  },
+
+  playButtonCostText: {
+    position: 'absolute',
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    top: 80,
+    left: 35,
+    zIndex: 4
+  },
+}
 );
 
 export default HomeScreen;
