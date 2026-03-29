@@ -51,7 +51,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
               <TouchableOpacity style = {styles.playButtonContainer}
                     onPress={() => navigation.navigate("CabSelect")}
                       >
-                  <View style = {{borderWidth: 3, borderColor: "#b7ff00ff"}}>
+                  <View>
                       <Image source={PlayButton} style={styles.playButtonImage} />
                       <Text style = {styles.playButtonPlayText}>Play</Text>
                       <Text style = {styles.playButtonCostText}>10 Tokens</Text>
@@ -154,18 +154,14 @@ const styles = StyleSheet.create({
   },
 
   playButtonWrapper: {
-    borderWidth: 3,
-    borderColor: "#FF003C",
     justifyContent: "flex-end",  // push claw to the bottom of main
     alignItems: "center",        // center horizontally
-    paddingTop: 0,            // space above navbar
+    paddingBottom: 10,            // space above navbar
   },
 
   // this hold the actual button so the touchable opacity can work 
   // and not take up the whole screen
   playButtonContainer: {
-    borderWidth: 3,
-    borderColor: "#ff7b00ff",
     justifyContent: "flex-start",
     alignItems: "baseline",
   },
