@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Switch,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
@@ -16,6 +17,7 @@ import useWebsocketStore from "../stores/WebsocketStore";
 import PlayDirectionalButtons from "./PlayDirectionalButtons";
 import DropClawButton from "./DropClawButton";
 import arcadeMachine from "../assets/ArcadeBackground.png";
+import SwitchCameraButton from "./SwitchCameraButton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,6 +42,11 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
     };
   }, [WS_URL, connect, disconnect]);
 
+  const cancelMove = () => {
+    if (!isConnected) return;
+    sendBytes([0]);
+  };
+
   const handleMoveUp = () => {
     if (!isConnected) return;
     sendBytes([1]);
@@ -60,14 +67,14 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
     sendBytes([4]);
   };
 
-  const cancelMove = () => {
-    if (!isConnected) return;
-    sendBytes([0]);
-  };
-
   const coinButton = () => {
     if (!isConnected) return;
     sendBytes([7]);
+  };
+
+  const switchCamera = () => {
+    if (!isConnected) return;
+    sendBytes([8]);
   };
 
   return (
@@ -113,6 +120,11 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
             {/* Top layer: controls */}
             <View style={styles.controlsContainer}>
+              <View style={styles.switchCameraWrap}>
+                <SwitchCameraButton onPress={switchCamera} size={width*0.22}></SwitchCameraButton>
+              </View>
+
+
               <View style={styles.controlsOverlay}>
                 <View style={styles.dropButtonWrap}>
                   <DropClawButton onPress={coinButton} size={width*0.3} />
@@ -220,7 +232,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     flex: 1,
-    opacity: 0.5,
     width: "100%",
     height: Math.min(height * 0.89, 1760),
     zIndex: 5,
@@ -236,7 +247,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    top: height * 0.66,
+    top: height * 0.57,
     width: width,
     zIndex: 10,
     flex: 1,
@@ -261,7 +272,15 @@ const styles = StyleSheet.create({
   dropButtonWrap: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 40,
+  },
+
+  switchCameraWrap: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: "10%",
+    marginBottom: "13%",
   },
 
   statusWrap: {

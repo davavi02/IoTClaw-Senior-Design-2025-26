@@ -1,22 +1,18 @@
 import React, { useState } from "react";
 import { Pressable, Image, Text, StyleSheet, ViewStyle } from "react-native";
-import dropButtonPressed from "../assets/DropButtonPressed.png";
-import dropButtonUnpressed from "../assets/DropButtonUnpressed.png";
+import SwitchCameraButtonUnpressed from "../assets/SwitchCameraButtonUnpressed.png";
+import SwitchCameraButtonPressed from "../assets/SwitchCameraButtonPressed.png";
 
-type DropClawButtonProps = {
+type SwitchCameraButtonProps = {
   onPress: () => void;
   disabled?: boolean;
-  C_UNPRESSED?: string;
-  C_PRESSED?: string;
   C_BORDER?: string;
   size?: number;
 };
 
-const DropClawButton: React.FC<DropClawButtonProps> = ({
+const SwitchCameraButton: React.FC<SwitchCameraButtonProps> = ({
   onPress,
   disabled = false,
-  C_UNPRESSED = "#2f15a1",
-  C_PRESSED = "#00e5ff",
   C_BORDER = "#070118",
   size = 80,
 }) => {
@@ -32,18 +28,20 @@ const DropClawButton: React.FC<DropClawButtonProps> = ({
         styles.button,
         {
           width: size,
-          height: size,
-          borderRadius: size / 2,
-          opacity: disabled ? 0.4 : 1,
+          height: size / 2,
+          opacity: 1,
         },
       ]}
     >
-      <Image source={pressed ? dropButtonPressed : dropButtonUnpressed} style={{ width: size, height: size }} />
+      <Image
+        source={pressed ? SwitchCameraButtonPressed : SwitchCameraButtonUnpressed}
+        style={{ width: size, height: size / 2 }}
+      />
     </Pressable>
   );
 };
 
-export default DropClawButton;
+export default SwitchCameraButton;
 
 const styles = StyleSheet.create({
   button: {

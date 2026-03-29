@@ -1,19 +1,25 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, Image, StyleSheet } from "react-native";
 import Svg, { Polygon, Rect } from "react-native-svg";
 import useWebsocketStore from "../stores/WebsocketStore";
+import leftButtonPressed from "../assets/DpadButtonImages/LeftButtonPressed.png";
+import leftButtonUnpressed from "../assets/DpadButtonImages/LeftButtonUnpressed.png";
+import rightButtonPressed from "../assets/DpadButtonImages/RightButtonPressed.png";
+import rightButtonUnpressed from "../assets/DpadButtonImages/RightButtonUnpressed.png";
+import downButtonPressed from "../assets/DpadButtonImages/DownButtonPressed.png";
+import downButtonUnpressed from "../assets/DpadButtonImages/DownButtonUnpressed.png";
+import upButtonPressed from "../assets/DpadButtonImages/UpButtonPressed.png";
+import upButtonUnpressed from "../assets/DpadButtonImages/UpButtonUnpressed.png";
 
 const DPAD_SIZE = 170;
 
 const C_BG = "transparent";
-const C_UNPRESSED = "#F5C300";
-const C_PRESSED = "#ff5722";
-const C_BORDER = "#070118";
 
 const S = 220;
 const GAP = S / 25;
-const CG = S / 6;
+const CG = S / 13;
 const C = S / 2;
+const buttonRatio = 30/64;
 
 const PTS = {
   up: `${GAP},0 ${S - GAP},0 ${C + CG / 2},${C - CG / 2 - GAP} ${C - CG / 2},${C - CG / 2 - GAP}`,
@@ -41,6 +47,10 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
 }) => {
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const [pressed, setPressed] = useState<Direction | null>(null);
+  const [leftPressed, setLeftPressed] = useState(false);
+  const [rightPressed, setRightPressed] = useState(false);
+  const [upPressed, setUpPressed] = useState(false);
+  const [downPressed, setDownPressed] = useState(false);
 
   const handlePressIn = (direction: Direction) => {
     if (!isConnected) return;
@@ -50,15 +60,31 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
     switch (direction) {
       case "up":
         pressUp();
+        setUpPressed(true);
+        setDownPressed(false);
+        setLeftPressed(false);
+        setRightPressed(false);
         break;
       case "down":
         pressDown();
+        setDownPressed(true);
+        setUpPressed(false);
+        setLeftPressed(false);
+        setRightPressed(false);
         break;
       case "left":
         pressLeft();
+        setLeftPressed(true);
+        setUpPressed(false);
+        setDownPressed(false);
+        setRightPressed(false);
         break;
       case "right":
         pressRight();
+        setRightPressed(true);
+        setUpPressed(false);
+        setDownPressed(false);
+        setLeftPressed(false);
         break;
     }
   };
@@ -67,11 +93,12 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
     if (!isConnected) return;
 
     setPressed(null);
+    setDownPressed(false);
+    setLeftPressed(false);
+    setRightPressed(false);
+    setUpPressed(false);
     cancelMove();
   };
-
-  const fillFor = (direction: Direction) =>
-    pressed === direction ? C_PRESSED : C_UNPRESSED;
 
   return (
     <View style={styles.controlsOverlay}>
@@ -79,43 +106,37 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
         <Svg width={DPAD_SIZE} height={DPAD_SIZE} viewBox={`0 0 ${S} ${S}`}>
           <Rect x="0" y="0" width={S} height={S} fill={C_BG} />
 
+          <Image source={upPressed? upButtonPressed : upButtonUnpressed} style={styles.upButton} />
+
           <Polygon
             points={PTS.up}
-            fill={fillFor("up")}
-            stroke={C_BORDER}
-            strokeWidth={6}
             onPressIn={() => handlePressIn("up")}
             onPressOut={handlePressOut}
           />
 
+          <Image source={leftPressed? leftButtonPressed : leftButtonUnpressed} style={styles.leftButton} />
+
           <Polygon
             points={PTS.left}
-            fill={fillFor("left")}
-            stroke={C_BORDER}
-            strokeWidth={2}
             onPressIn={() => handlePressIn("left")}
             onPressOut={handlePressOut}
           />
 
+          <Image source={downPressed? downButtonPressed : downButtonUnpressed} style={styles.downButton} />
+
           <Polygon
             points={PTS.down}
-            fill={fillFor("down")}
-            stroke={C_BORDER}
-            strokeWidth={6}
             onPressIn={() => handlePressIn("down")}
             onPressOut={handlePressOut}
           />
 
+          <Image source={rightPressed? rightButtonPressed : rightButtonUnpressed} style={styles.rightButton} />
+
           <Polygon
             points={PTS.right}
-            fill={fillFor("right")}
-            stroke={C_BORDER}
-            strokeWidth={6}
             onPressIn={() => handlePressIn("right")}
             onPressOut={handlePressOut}
           />
-
-
         </Svg>
       </View>
     </View>
@@ -130,7 +151,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "flex-end",
-    paddingBottom: 30,
+    paddingBottom: 0,
   },
 
   dpad: {
@@ -138,4 +159,41 @@ const styles = StyleSheet.create({
     height: DPAD_SIZE,
     backgroundColor: "transparent",
   },
+
+  leftButton: {
+    position: "absolute",
+    top: 0,
+    left: -GAP/2,
+    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+    width: DPAD_SIZE * buttonRatio,
+    height: DPAD_SIZE,
+  },
+
+  rightButton: {
+    position: "absolute",
+    top: 0,
+    right: -GAP/2,
+    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+    width: DPAD_SIZE * buttonRatio,
+    height: DPAD_SIZE,
+  },
+  
+  downButton: {
+    position: "absolute",
+    bottom: -GAP/2,
+    left: 0,
+    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+    width: DPAD_SIZE,
+    height: DPAD_SIZE * buttonRatio,
+  },
+
+  upButton: {
+    position: "absolute",
+    top: -GAP/2,
+    left: 0,
+    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+    width: DPAD_SIZE,
+    height: DPAD_SIZE*buttonRatio,
+  },
+
 });
