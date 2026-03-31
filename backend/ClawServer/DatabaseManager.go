@@ -13,7 +13,7 @@ type DatabaseManager struct {
 }
 
 func InitializeDatabase() (*DatabaseManager, error) {
-	dbcon, err := sql.Open("mysql", "clawser:reallyhardpassword1!@tcp(34.174.114.55:20206)/clawser")
+	dbcon, err := sql.Open("mysql", "clawser:reallyhardpassword1!@tcp(34.174.114.55:20206)/clawser?parseTime=true")
 	if err != nil {
 		fmt.Printf("Error initializing DB: %v\n", err)
 		return nil, err

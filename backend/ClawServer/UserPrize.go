@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"database/sql"
-	"strconv"
 	"time"
 )
 
 // UserPrizeJSON matches the React Native Prize type fields.
 type UserPrizeJSON struct {
-	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	DateWon     string `json:"dateWon"`
@@ -20,8 +18,8 @@ type UserPrizeJSON struct {
 
 func GetUserPrizesForUID(ctx context.Context, db *sql.DB, uid int64) ([]UserPrizeJSON, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT PID, Name, Description, PicUrl, WonAt, IsShipped, IsDelivered
-		FROM UserPrize WHERE UID = ? ORDER BY WonAt DESC`, uid)
+		SELECT p.Name, p.Description, p.PicUrl, u.WonAt, u.IsShipped, u.IsDelivered
+		FROM UserPrize u INNER JOIN Prize p on u.PID = p.PID WHERE UID = ? ORDER BY WonAt DESC`, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +28,6 @@ func GetUserPrizesForUID(ctx context.Context, db *sql.DB, uid int64) ([]UserPriz
 	out := make([]UserPrizeJSON, 0)
 	for rows.Next() {
 		var (
-			pid         int64
 			name        string
 			description sql.NullString
 			picURL      sql.NullString
@@ -38,7 +35,7 @@ func GetUserPrizesForUID(ctx context.Context, db *sql.DB, uid int64) ([]UserPriz
 			shipped     int64
 			delivered   int64
 		)
-		if err := rows.Scan(&pid, &name, &description, &picURL, &wonAt, &shipped, &delivered); err != nil {
+		if err := rows.Scan(&name, &description, &picURL, &wonAt, &shipped, &delivered); err != nil {
 			return nil, err
 		}
 		desc := ""
@@ -50,7 +47,6 @@ func GetUserPrizesForUID(ctx context.Context, db *sql.DB, uid int64) ([]UserPriz
 			img = picURL.String
 		}
 		out = append(out, UserPrizeJSON{
-			ID:          strconv.FormatInt(pid, 10),
 			Name:        name,
 			Description: desc,
 			DateWon:     wonAt.UTC().Format(time.RFC3339),
