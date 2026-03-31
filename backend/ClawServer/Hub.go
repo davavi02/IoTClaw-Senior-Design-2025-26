@@ -21,11 +21,16 @@ type Hub struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
+	// outbound messages
+	outboundMessage chan *Packet
+
 	//Cabinent
 	cabinent *Client
 
 	//Information about the game
 	gameData *GameData
+
+	queue *Queue
 
 	//USed to delete the game from the list when we are done.
 	activeGames *ActiveGames
@@ -33,13 +38,15 @@ type Hub struct {
 
 func newHub(container *ActiveGames, gameData *GameData) *Hub {
 	return &Hub{
-		broadcast:   make(chan *Packet),
-		register:    make(chan *Client),
-		unregister:  make(chan *Client),
-		clients:     make(map[*Client]bool),
-		gameData:    gameData,
-		activeGames: container,
-		cabinent:    nil,
+		broadcast:       make(chan *Packet),
+		register:        make(chan *Client),
+		unregister:      make(chan *Client),
+		outboundMessage: make(chan *Packet, 256),
+		clients:         make(map[*Client]bool),
+		gameData:        gameData,
+		activeGames:     container,
+		cabinent:        nil,
+		queue:           CreateQueue(),
 	}
 }
 
@@ -54,8 +61,11 @@ func (h *Hub) run() {
 			}
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
+				//Removes client.
+				h.RemoveFromQueue(client)
 				delete(h.clients, client)
 				close(client.send)
+
 				if client.isCabinent {
 					h.cabinent = nil
 				}
@@ -65,15 +75,92 @@ func (h *Hub) run() {
 				continue
 			}
 			if message.Sender == h.cabinent {
-				continue //Dont care for now, cabinent in test is just a dummy
+				h.handleServerMessage(message)
+			} else {
+				h.handleClientMessage(message)
 			}
-			select {
+			/*select {
 			case h.cabinent.send <- message:
 			default:
 				close(h.cabinent.send)
 				delete(h.clients, h.cabinent)
 				h.cabinent = nil
+			}*/
+
+		case message := <-h.outboundMessage:
+			if _, ok := h.clients[message.Sender]; ok {
+				select {
+				case message.Sender.send <- message:
+				default:
+					h.RemoveFromQueue(message.Sender)
+					delete(h.clients, message.Sender)
+					close(message.Sender.send)
+				}
 			}
+		}
+	}
+}
+
+func (h *Hub) handleClientMessage(message *Packet) {
+	data, err := message.GetPacketData()
+	if err {
+		return
+	}
+
+	if message.Sender == nil {
+		return
+	}
+
+	if data >= 0 && data <= 6 {
+		//Control messages lets see if they are first
+		if message.Sender == h.queue.GetFrontQueue() {
+			if h.cabinent != nil {
+				h.outboundMessage <- NewPacketUInt8(data, h.cabinent)
+			}
+		}
+	}
+
+	switch data {
+	case 200:
+		h.joinQueue(message.Sender)
+	case 204:
+		h.RemoveFromQueue(message.Sender)
+	}
+}
+
+func (h *Hub) handleServerMessage(message *Packet) {
+	data, err := message.GetPacketData()
+	if err {
+		return
+	}
+
+	switch data {
+	case 0:
+		//Win logic here...
+		data += 1
+		for x, _ := range h.clients {
+			h.outboundMessage <- NewPacketUInt8(124, x)
+		}
+	case 1:
+		//Lose logic here
+		data += 1
+	case 2:
+		//Ready lets swap the queue
+		h.RemoveFromQueue(nil)
+		if h.queue.GetFrontQueue() != nil {
+			//Send the coin token its play time..
+			h.outboundMessage <- NewPacketUInt8(7, message.Sender)
+		}
+	}
+}
+
+func (h *Hub) joinQueue(c *Client) {
+	_, place := h.queue.AddToQueue(c)
+	h.outboundMessage <- NewPacketUInt8(place, c)
+	if place == 1 {
+		//That means queue was idle send ready token.
+		if h.cabinent != nil {
+			h.outboundMessage <- NewPacketUInt8(7, h.cabinent)
 		}
 	}
 }

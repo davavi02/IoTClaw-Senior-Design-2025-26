@@ -30,7 +30,7 @@ func (container *ActiveGames) CreateGame(game *GameData) bool {
 	hub := newHub(container, game)
 	container.activeGame[game.Name] = hub
 	go hub.run()
-	return ok
+	return false
 }
 
 func (container *ActiveGames) DoesGameExist(game *GameData) bool {
@@ -57,7 +57,7 @@ func (container *ActiveGames) JoinGame(w http.ResponseWriter, r *http.Request, d
 			http.Error(w, "Games can only join their own games.", http.StatusForbidden)
 		}
 	}
-	serveWs(hub, w, r, data.IsGame)
+	serveWs(hub, w, r, data)
 }
 
 // Realistically if I was doing something more production ready this would be cached...

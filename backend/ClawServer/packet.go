@@ -22,3 +22,23 @@ func CreatePacket(data []byte, sender *Client, packetType int) *Packet {
 		PacketType: packetType,
 	}
 }
+
+func NewPacketUInt8(val uint8, cli *Client) *Packet {
+	return &Packet{
+		Data:       []byte{val},
+		Sender:     cli,
+		PacketType: websocket.BinaryMessage,
+	}
+}
+
+// bool if true = err
+func (p *Packet) GetPacketData() (uint8, bool) {
+	if p.PacketType != websocket.BinaryMessage {
+		return 0, true
+	}
+
+	if len(p.Data) == 0 {
+		return 0, true
+	}
+	return p.Data[0], false
+}

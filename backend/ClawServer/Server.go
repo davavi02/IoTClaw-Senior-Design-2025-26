@@ -417,16 +417,16 @@ func (server *Server) handleCreateGameRoom(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	///check if game exists
+	/*//check if game exists
 	if server.rooms.DoesGameExist(gameData) {
 		//Game exists...
 		http.Error(w, "Game already made", http.StatusConflict)
 		return
-	}
+	}*/
 
 	if server.rooms.CreateGame(gameData) {
-		http.Error(w, "Game creation issue", http.StatusInternalServerError)
-		return
+		//http.Error(w, "Game creation issue", http.StatusInternalServerError)
+		fmt.Println("Room already created..")
 	}
 
 	//make a jwt and send it mann

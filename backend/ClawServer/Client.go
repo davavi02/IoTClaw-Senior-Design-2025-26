@@ -57,7 +57,9 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	hub *Hub
 
-	// The websocket connection.
+	jwtData *JWTData
+
+	// The websocket connection.cd
 	conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
@@ -130,6 +132,7 @@ func (c *Client) writePump() {
 				w.Write(newline)
 				w.Write(packet.Data)
 			}
+			fmt.Println("Message sent: ", message.Data)
 
 			if err := w.Close(); err != nil {
 				return
@@ -144,13 +147,13 @@ func (c *Client) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, isCab bool) {
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, data *JWTData) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan *Packet), isCabinent: isCab}
+	client := &Client{hub: hub, conn: conn, send: make(chan *Packet), isCabinent: data.IsGame, jwtData: data}
 	client.hub.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in
