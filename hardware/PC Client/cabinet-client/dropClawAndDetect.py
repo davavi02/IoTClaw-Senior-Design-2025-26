@@ -48,8 +48,8 @@ def dropClawAndDetect(messages, game):
         game.active = 0
         if found == 3:
             print("Prize won")
-            messages.put(1)
+            messages.put(2)
         else:
             print("No prize")
-            messages.put(0)
+            messages.put(2)
     #cv.destroyAllWindows()

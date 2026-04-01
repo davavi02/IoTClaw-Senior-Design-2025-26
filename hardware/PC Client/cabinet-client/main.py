@@ -13,7 +13,6 @@ REQUEST_MESSAGE = '{"name": "The-Claw", "password":"1234567890"}'
 request = requests.post("http://html-server.babid.net:20206/api/creategame", data=REQUEST_MESSAGE)
 JWT = request.text.strip().rsplit('"')[-2]
 print("JWT:", JWT)
-
 ADDRESS = "ws://html-server.babid.net:20206/api/join/The-Claw"
 headers = {"Authorization": f"Bearer {JWT}"}
 #ADDRESS = "ws://localhost:8765" #Local testing
@@ -57,37 +56,49 @@ async def messageReceived(websocket):
                         print("Ending game, checking for prize...")
                         detect_thread = threading.Thread(target=dropClawAndDetect, args=(messages, game))
                         detect_thread.start()
+                        message = struct.pack("B", 2)
+                        time.sleep(15)
+                        print("2 sent")
+                        await websocket.send(message, text=False)
                     elif message == 6:
                         asyncio.create_task(obs.toggle_camera())
                 elif message == 6:
                     asyncio.create_task(obs.toggle_camera())
                 else:
-                    if message == 7 and game.status == 0:
+                    if message == 7 and game.status == 0 and game.active == False:
                         game.active = True
                         game.status == 1
                         print("Starting Game")
                         move_thread = threading.Thread(target=moveClaw, args=(message,))
                         move_thread.start()
-                        timer_thread = threading.Thread(target=timerManager, args=(game, 30))
+                        timer_thread = threading.Thread(target=timerManager, args=(game, 15))
                         timer_thread.start()
 
-async def sendMessages(websocket):
-    if messages:
-        message = messages.get()
-        if message == 2:
-            time.sleep(3)
-        message = struct.pack("B", message)
-        await websocket.send(message, text=False)
+async def sendMessages(websocket, messages):
+    # while True:        
+        if list(messages.queue):
+            print("Messages:", list(messages.queue))
+            message = messages.get()
+            if message == 2:
+                time.sleep(3)
+            message = struct.pack("B", message)
+            websocket.send(message, text=False)
 
 async def main():
     while True:
         try:
+            print(headers)
             async with connect(ADDRESS, additional_headers=headers) as websocket:
-                asyncio.create_task(messageReceived(websocket))
-                # TODO: Get response messages working
-                #asyncio.create_task(sendMessages(websocket))
-        except:
-            pass
+                #sendMessages(websocket, messages)
+                # msg_t = threading.Thread(target=sendMessages, args=(websocket, messages))
+                # msg_t.start()
+                await messageReceived(websocket)
+                #print("Loop")
+                #await sendMessages(websocket)
+        except Exception as e:
+            print(e)
+            print("Something happened with websocket, retrying in 3")
+            time.sleep(8)
 
 
 # TODO: Ensure socket doesn't disconnect due to timeout
