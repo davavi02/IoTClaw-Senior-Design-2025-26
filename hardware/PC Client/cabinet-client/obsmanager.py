@@ -128,7 +128,7 @@ class OBSManager:
         self.stop_timer()
         self.set_text(TEXT_TIMER, "")
 
-    async def toggle_camera(self):
+    def toggle_camera(self):
         #Cycle to the next camera scene cycling 1,2,3,1
         self.current_camera_index = (self.current_camera_index + 1) % len(CAMERA_SCENES)
         scene = CAMERA_SCENES[self.current_camera_index]

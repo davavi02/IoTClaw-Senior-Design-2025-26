@@ -34,7 +34,7 @@ def dropClawAndDetect(messages, game):
             cv.imwrite("test{0}.png".format(tries), marked)
             time.sleep(1)
             try:
-                if (np.size(ids, axis=0) == 5):
+                if not (np.size(ids, axis=0) == 5):
                     found += 1
             except:
                 pass
@@ -48,8 +48,8 @@ def dropClawAndDetect(messages, game):
         game.active = 0
         if found == 3:
             print("Prize won")
-            messages.put(2)
+            messages.put(0)
         else:
             print("No prize")
-            messages.put(2)
+            messages.put(1)
     #cv.destroyAllWindows()
