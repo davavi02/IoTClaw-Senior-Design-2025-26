@@ -29,7 +29,6 @@ def dropClawAndDetect(messages, game):
             marked = cv.flip(marked, 1)
             corners, ids, rejected = detector.detectMarkers(marked)
             cv.aruco.drawDetectedMarkers(marked, corners, ids)
-            # cv.imshow('frame', marked)
             # Save images to files, imshow too slow to load in a window
             cv.imwrite("test{0}.png".format(tries), marked)
             time.sleep(1)
@@ -42,8 +41,6 @@ def dropClawAndDetect(messages, game):
         cap.release()
     except Exception:
         raise Exception
-    # Amount of successful checks to determine if won
-    # TODO: Change return to websocket message
     else:
         game.active = 0
         if found == 3:
@@ -52,4 +49,3 @@ def dropClawAndDetect(messages, game):
         else:
             print("No prize")
             messages.put(1)
-    #cv.destroyAllWindows()

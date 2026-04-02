@@ -17,27 +17,34 @@ headers = {"Authorization": f"Bearer {JWT}"}
 #ADDRESS = "ws://localhost:8765" #Local testing
 #headers = None #Local testing
 
-obs = OBSManager()
 class Events:
     time = 0
     active = False
     status = 0
+    movement = False
 game = Events()
 messages = queue.Queue()
+obs = OBSManager()
 
-def timerManager(timer_var, length):
-    timer_var.time = length
-    while timer_var.time > 0 and game.active:
-        print("Timer", timer_var.time)
-        # Message to OBS to update timer here?
-        obs.set_text("Timer Text", "Timer: " + str(timer_var.time))
+def timerManager(game, length):
+    game.time = length
+    while game.time > 0 and game.active:
+        print("Timer", game.time)
+        if game.time > 15:
+            obs.set_text("Timer Text", "View Time: " + str(game.time - 15))
+        else:
+            obs.set_text("Timer Text", "Play Time: " + str(game.time))
+        if game.time == 15:
+            messages.put(205)
+            game.movement = True
         time.sleep(1)
-        timer_var.time -= 1
+        game.time -= 1
     obs.set_text("Timer Text", "Timer: " + str(0))
-    if timer_var.active:
-        timer_var.active = False
+    if game.active:
+        game.active = False
         print("Timer ran out, checking for prize...")
-        dropClawAndDetect(messages, timer_var)
+        moveClaw()
+        dropClawAndDetect(messages, game)
 
 
 def parseMessages(websocket):
@@ -46,7 +53,7 @@ def parseMessages(websocket):
                 # Unpack binary data and get number
                 message = struct.unpack("B", message)[0]
                 print(message)
-                if game.active:
+                if game.active and game.movement:
                     if message >= 0 and message <= 4:
                         move_thread = threading.Thread(target=moveClaw, args=(message,))
                         move_thread.start()
@@ -66,7 +73,7 @@ def parseMessages(websocket):
                         print("Starting Game")
                         move_thread = threading.Thread(target=moveClaw, args=(message,))
                         move_thread.start()
-                        timer_thread = threading.Thread(target=timerManager, args=(game, 15))
+                        timer_thread = threading.Thread(target=timerManager, args=(game, 25))
                         timer_thread.start()
 
 def sendMessages(websocket, messages):
@@ -76,9 +83,12 @@ def sendMessages(websocket, messages):
             message = messages.get()
             message = struct.pack("B", message)
             websocket.send(message, text=False)
-            time.sleep(3)
-            message = struct.pack("B", int(2))
-            websocket.send(message, text=False)
+            print("Sent:", message)
+            if message == 1 or message == 0:
+                time.sleep(3)
+                message = struct.pack("B", int(2))
+                websocket.send(message, text=False)
+                print("Sent:", message)
 
 def main():
     while True:
