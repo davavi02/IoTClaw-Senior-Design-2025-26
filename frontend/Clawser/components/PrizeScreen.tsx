@@ -30,7 +30,7 @@ const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
           <View style={styles.main}>
             {/* HEADER */}
             <View style={styles.headerWrapper}>
-                <HeaderBar/>
+                <HeaderBar useLogoInstead={true}></HeaderBar>
             </View>
 
             {/* Prize Cards */}

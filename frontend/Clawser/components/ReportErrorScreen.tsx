@@ -10,14 +10,11 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import CoinsButton from './CoinsButton';
-import ClawzerTitle from '../assets/ClawzerTitle.png';
 import { callProtectedRoute } from '../services/ApiService';
 import { ReportErrorProps } from './Routes';
+import HeaderBar from './HeaderBar';
 
 const ReportErrorScreen: React.FC<ReportErrorProps> = ({ navigation }) => {
   const [subject, setSubject] = useState('');
@@ -62,29 +59,14 @@ const ReportErrorScreen: React.FC<ReportErrorProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.root} edges={['top']}>
+    <View style={styles.root}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
       >
         <View style={styles.screen}>
-          <View style={styles.headerOutline}>
-            <View style={styles.headerSide}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              >
-                <Text style={styles.backText}>← Back</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.headerCenter}>
-              <Image source={ClawzerTitle} style={styles.topLogo} />
-            </View>
-            <View style={[styles.headerSide, styles.headerSideRight]}>
-              <CoinsButton onPress={() => navigation.navigate('Shop')} />
-            </View>
-          </View>
+          <HeaderBar></HeaderBar>
 
           <ScrollView
             contentContainerStyle={styles.scroll}
@@ -146,7 +128,7 @@ const ReportErrorScreen: React.FC<ReportErrorProps> = ({ navigation }) => {
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -157,23 +139,6 @@ const styles = StyleSheet.create({
   },
   flex: { flex: 1 },
   screen: { flex: 1 },
-  headerOutline: {
-    width: '100%',
-    minHeight: 91,
-    borderBottomWidth: 3,
-    borderBottomColor: '#FF2F00',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: '#0B0029',
-  },
-  headerSide: { width: 100, justifyContent: 'center' },
-  headerSideRight: { alignItems: 'flex-end' },
-  headerCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  backText: { color: '#00E5FF', fontSize: 16, fontWeight: '700' },
-  topLogo: { width: 120, height: 40, resizeMode: 'contain' },
   scroll: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 40 },
   screenTitle: {
     color: '#FFF',

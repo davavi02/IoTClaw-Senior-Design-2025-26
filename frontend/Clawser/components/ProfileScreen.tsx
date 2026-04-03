@@ -7,33 +7,21 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNavBar from '../components/BottomNavBar';
-import CoinsButton from '../components/CoinsButton';
 import ProfileAvatar from '../assets/icons/PFP.png';
-import ClawzerTitle from '../assets/ClawzerTitle.png';
 import useUserDataStore from '../stores/UserDataStore';
 import { useAuthStore } from '../stores/AuthStore';
 import { ProfileProps } from './Routes';
+import HeaderBar from './HeaderBar';
+import Background from './Background';
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
   const { numTokens } = useUserDataStore();
   const { signOut, user } = useAuthStore();
 
   return (
-    <SafeAreaView style={styles.root} edges={['none']}>
-      <View style={styles.screen}>
-
-        {/* TOP HEADER */}
-        <View style={styles.headerWrapper}>
-          <View style={styles.headerOutline}>
-            <Image source={ClawzerTitle} style={styles.topLogo} />
-            <CoinsButton
-              onPress={() => navigation.navigate('Shop')}
-              style={styles.coinsButton}
-            />
-          </View>
-        </View>
+      <Background>
+        <HeaderBar useLogoInstead={true}></HeaderBar>
 
         {/* SCROLLABLE CONTENT */}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -84,10 +72,6 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
                 <Text style={styles.actionButtonText}>Prize Tracking</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton}>
-                <Text style={styles.actionButtonText}>Notifications</Text>
-              </TouchableOpacity>
-
               <TouchableOpacity 
                 style={styles.actionButton}
                 onPress={() => signOut()}
@@ -106,8 +90,7 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
           onPressMap={() => navigation.navigate('Prize')}
           onPressProfile={() => navigation.navigate('Profile')}
         />
-      </View>
-    </SafeAreaView>
+      </Background>
   );
 };
 
@@ -121,35 +104,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-
-  headerWrapper: {
-    alignItems: 'center',
-  },
-
-  headerOutline: {
-    width: '100%',
-    height: 91,
-    borderBottomWidth: 3,
-    borderBottomColor: '#FF2F00',
-    borderRadius: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    marginTop: 0,
-    backgroundColor: '#0B0029',
-  },
-
-  topLogo: {
-    width: 133,
-    height: 45,
-    resizeMode: 'contain',
-  },
-
-  coinsButton: {
-    marginRight: 0,
-  },
-
   scrollContainer: {
     paddingVertical: 20,
     paddingHorizontal: 15,

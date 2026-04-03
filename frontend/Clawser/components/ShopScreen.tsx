@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import CoinsButton from './CoinsButton';
 import { callProtectedRoute } from '../services/ApiService';
+import HeaderBar from './HeaderBar';
 
 interface Product {
   uid: number;
@@ -61,14 +62,7 @@ const ShopScreen = ({route, navigation}: ShopProps) => {
 
   return (
     <Background>
-      
-      <View style={styles.shopHeader}>
-        <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.goBack()}}>
-          <Text style={styles.backText}>{"< Back"}</Text>
-        </TouchableOpacity>
-        <CoinsButton></CoinsButton>
-
-      </View>
+      <HeaderBar></HeaderBar>
 
       <View style={styles.shopBannerContainer}>
         <View style={styles.shopBanner}>
@@ -101,16 +95,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "center",
   },
-  shopHeader: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "#0B0028",
-    borderBottomWidth: 3,
-    borderColor: "#FF003C",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-  },
   shopBannerContainer: {
     padding: 10,
   },
@@ -138,20 +122,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#FFFFFF",
   },
-  backText: {
-    fontSize: 24,
-    color: "#FFFFFF",
-    alignSelf: "center",
-  },
-  backButton: {
-    width: 100,
-    height: 50,
-    backgroundColor: "#FF003C",
-    borderWidth: 8,
-    borderRadius: 20,
-    borderColor: "#FFFFFF",
-    justifyContent: "center",
-  }
 });
 
 export default ShopScreen;

@@ -74,7 +74,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
   const switchCamera = () => {
     if (!isConnected) return;
-    sendBytes([8]);
+    sendBytes([6]);
   };
 
   return (
@@ -83,13 +83,6 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
         <View style={styles.headerOverlay}>
           <HeaderBar />
         </View>
-
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
 
         <View style={styles.mainArea}>
           <View style={styles.machineArea}>
@@ -171,22 +164,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 40,
-  },
-
-  backButton: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 50,
-    backgroundColor: "#000",
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-  },
-
-  backText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
   },
 
   mainArea: {

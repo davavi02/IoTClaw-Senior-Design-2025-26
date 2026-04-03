@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { callProtectedRoute } from '../services/ApiService';
+import HeaderBar from './HeaderBar';
 
 const MOCK_CABINETS: CabinentData[] = 
   [
@@ -92,12 +93,7 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
   return (
     <Background>
       
-      <View style={styles.shopHeader}>
-        <TouchableOpacity style={styles.backButton} onPressOut={()=>{navigation.goBack()}}>
-          <Text style={styles.backText}>{"< Back"}</Text>
-        </TouchableOpacity>
-        <CoinsButton></CoinsButton>
-      </View>
+      <HeaderBar></HeaderBar>
       
       <View style={[styles.shopContainer, { flexWrap: 'wrap', justifyContent: 'center' }]}>
         
@@ -118,12 +114,16 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
         ))}
       </View>
 
-      <View>
-        <TouchableOpacity style={styles.backButton} onPressOut={getCabData}>
-          <Text style={styles.backText}>{"Refresh!!!"}</Text>
+      <View style={styles.shopItemCol}>
+        <TouchableOpacity 
+          style={styles.playbtn} 
+          onPressOut={getCabData}>
+          <Text style={styles.btnText}>Refresh!</Text>
         </TouchableOpacity>
       </View>
     </Background>
+
+    
 
   );
 };
@@ -133,19 +133,6 @@ const styles = StyleSheet.create({
     flex: 6,
     flexDirection: "row",
     alignSelf: "center",
-  },
-  shopHeader: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "#0B0028",
-    borderBottomWidth: 3,
-    borderColor: "#FF003C",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-  },
-  shopBannerContainer: {
-    padding: 10,
   },
   shopBanner: {
     width: 320,
@@ -158,32 +145,26 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
   },
-  bannerText: {
-    fontSize: 32,
-    color: "#FFFFFF",
-  },
   shopItemCol: {
     flexDirection: "column",
     alignItems: "center",
     padding: 10,
   },
-  tokenText: {
-    fontSize: 32,
-    color: "#FFFFFF",
-  },
-  backText: {
-    fontSize: 24,
-    color: "#FFFFFF",
-    alignSelf: "center",
-  },
-  backButton: {
-    width: 100,
-    height: 50,
-    backgroundColor: "#FF003C",
-    borderWidth: 8,
-    borderRadius: 20,
+
+  playbtn: {
+    width: 120,
+    height: 40,
+    borderWidth: 2,
     borderColor: "#FFFFFF",
+    backgroundColor: "#5cf300",
+    borderRadius: 8,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  btnText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
   }
 });
 
