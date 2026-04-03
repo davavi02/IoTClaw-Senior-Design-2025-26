@@ -1,0 +1,7 @@
+# Python dev files
+.venv/
+.uv/
+dist/
+build/
+*.spec
+__pycache__/

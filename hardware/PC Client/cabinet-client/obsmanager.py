@@ -45,8 +45,6 @@ class OBSManager:
     def __init__(self):
         self.ws = None
         self.current_camera_index = 0
-        #self._timer_thread = None
-        #self._timer_stop = threading.Event()
 
     # ------------------------------------------------------------------ #
     #  Connection

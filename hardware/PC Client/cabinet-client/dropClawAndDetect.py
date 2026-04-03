@@ -5,8 +5,7 @@ import numpy as np
 import time
 from moveClaw import moveClaw
 
-def dropClawAndDetect(game, messages):
-    game.movement = False
+def dropClawAndDetect(messages):
     print("Dropping and Detecting")
     moveClaw(5)
     time.sleep(6)
@@ -16,16 +15,14 @@ def dropClawAndDetect(game, messages):
         detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
         cap = cv.VideoCapture(2)
         if not cap.isOpened():
-            print("Cannot open camera")
-            exit()
+            raise ValueError("Cannot open camera")
         # Amount of tries to check if a prize is won
         tries = 3
         found = 0
         while tries > 0:
             ret, frame = cap.read()
             if not ret:
-                print("Can't receive frame (stream end?). Exiting ...")
-                break
+                raise ValueError("Cannot get camera frame")
             marked = frame.copy()
             marked = cv.flip(marked, 1)
             corners, ids, rejected = detector.detectMarkers(marked)
@@ -40,12 +37,11 @@ def dropClawAndDetect(game, messages):
                 pass
             tries -= 1
         cap.release()
-    except Exception:
+    except Exception as e:
         time.sleep(3)
-        game.active = 0
-        raise Exception
+        print(e)
+        messages.put(1)
     else:
-        game.active = 0
         if found == 3:
             print("Prize won")
             messages.put(0)

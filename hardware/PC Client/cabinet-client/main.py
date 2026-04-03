@@ -14,8 +14,9 @@ JWT = request.text.strip().rsplit('"')[-2]
 print("JWT:", JWT)
 ADDRESS = "ws://html-server.babid.net:20206/api/join/The-Claw"
 headers = {"Authorization": f"Bearer {JWT}"}
-#ADDRESS = "ws://localhost:8765" #Local testing
-#headers = None #Local testing
+#Local testing
+#ADDRESS = "ws://localhost:8765" 
+#headers = None
 
 class Events:
     time = 0
@@ -27,7 +28,7 @@ obs = OBSManager()
 
 def timerManager(game, length, messages):
     game.time = length
-    while game.time > 0 and game.active:
+    while game.time > 0:
         print("Timer", game.time)
         if game.time > 15:
             obs.set_text("Timer Text", "View Time: " + str(game.time - 15))
@@ -39,11 +40,9 @@ def timerManager(game, length, messages):
         time.sleep(1)
         game.time -= 1
     obs.set_text("Timer Text", "Play Time: " + str(0))
-    if game.active:
-        game.active = False
-        print("Timer ran out, checking for prize...")
-        dropClawAndDetect(game, messages)
-
+    game.movement = False
+    print("Ending game, checking for prize...")
+    dropClawAndDetect(messages)
 
 def parseMessages(websocket):
     global game, messages
@@ -65,39 +64,36 @@ def parseMessages(websocket):
                         move_thread = threading.Thread(target=moveClaw, args=(message,))
                         move_thread.start()
                     elif message == 5:
-                        game.active = False
-                        print("Ending game, checking for prize...")
-                        detect_thread = threading.Thread(target=dropClawAndDetect, args=(game, messages))
-                        detect_thread.start()
+                        game.movement = False
+                        game.time = 0
 
-def sendMessages(websocket, messages):
+def sendMessages(websocket, game, messages):
     while True:        
         if list(messages.queue):
             print("Messages:", list(messages.queue))
-            message = messages.get()
-            message = struct.pack("B", message)
+            originalMsg = messages.get()
+            message = struct.pack("B", originalMsg)
             websocket.send(message, text=False)
-            print("Sent:", struct.unpack("B", message)[0])
-            if message == 1 or message == 0:
+            print("Sent:", originalMsg)
+            if originalMsg == 1 or originalMsg == 0:
                 time.sleep(3)
+                game.active = False
                 message = struct.pack("B", int(2))
                 websocket.send(message, text=False)
-                print("Sent:", struct.unpack("B", message)[0])
+                print("Sent: 2")
 
 def main():
     while True:
         try:
             print(headers)
             with connect(ADDRESS, additional_headers=headers) as websocket:
-                msg_t = threading.Thread(target=sendMessages, args=(websocket, messages))
+                msg_t = threading.Thread(target=sendMessages, args=(websocket, game, messages))
                 msg_t.start()
                 parseMessages(websocket)
         except Exception as e:
             print("Something happened with websocket, retrying in 8s:", e)
             time.sleep(8)
 
-
-# TODO: Ensure socket doesn't disconnect due to timeout
 if __name__ == "__main__":
     obs.connect()
     main()
