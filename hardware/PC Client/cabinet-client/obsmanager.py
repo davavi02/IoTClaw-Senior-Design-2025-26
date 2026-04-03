@@ -76,57 +76,9 @@ class OBSManager:
             inputName=source_name,
             inputSettings={"text": text}
         ))
-
-    def stop_timer(self):
-        #Signal any running countdown thread to stop
-        self._timer_stop.set()
-        if self._timer_thread and self._timer_thread.is_alive():
-            self._timer_thread.join(timeout=2)
-        self._timer_stop.clear()
-
     # ------------------------------------------------------------------ #
     #  Game flow
     # ------------------------------------------------------------------ #
-
-    def show_waiting_screen(self, on_complete_callback=None):
-    # ------------------------------------------------------------------ #
-    #   Switch to Waiting Screen, display setup message, count down 10 s,
-    #   then call on_complete_callback (if provided) when finished.
-    #   Runs the countdown on a background thread so it doesn't block asyncio.
-    # ------------------------------------------------------------------ #
-        self.stop_timer()
-        self.set_scene(SCENE_WAITING)
-        self.set_text(TEXT_STATUS, "Game being set up, please wait")
-        self.set_text(TEXT_TIMER, "10")
-
-        def _countdown():
-            for remaining in range(10, 0, -1):
-                if self._timer_stop.is_set():
-                    return
-                self.set_text(TEXT_TIMER, str(remaining))
-                time.sleep(1)
-            if not self._timer_stop.is_set():
-                self.set_text(TEXT_TIMER, "")
-                if on_complete_callback:
-                    on_complete_callback()
-
-        self._timer_thread = threading.Thread(target=_countdown, daemon=True)
-        self._timer_thread.start()
-
-    def show_camera_ready(self):
-    # ------------------------------------------------------------------ #
-    #   Switch to Camera 1 with 'Move claw to play' prompt.
-    #   Called after the waiting-screen countdown finishes.
-    # ------------------------------------------------------------------ #
-        self.current_camera_index = 0
-        self.set_scene(SCENE_CAMERA_1)
-        self.set_text(TEXT_STATUS, "Move claw to play")
-        self.set_text(TEXT_TIMER, "")
-
-    def stop_play_timer(self):
-        #Halt the running play timer when drop is triggered manually
-        self.stop_timer()
-        self.set_text(TEXT_TIMER, "")
 
     def toggle_camera(self):
         #Cycle to the next camera scene cycling 1,2,3,1
@@ -134,20 +86,3 @@ class OBSManager:
         scene = CAMERA_SCENES[self.current_camera_index]
         self.set_scene(scene)
         print(f"[OBS] Camera toggled -> {scene}")
-
-    def show_result_screen(self, won: bool):
-    # ------------------------------------------------------------------ #
-    #   Stop any running timer and switch to Win or Loss scene.
-    #   TODO: Update prize detection with true/false if able
-    #   won=True  -> Win Screen
-    #   won=False -> Loss Screen
-    # ------------------------------------------------------------------ #
-        self.stop_timer()
-        self.set_text(TEXT_TIMER, "")
-        if won:
-            self.set_scene(SCENE_WIN)
-            self.set_text(TEXT_STATUS, "You won a prize!")
-        else:
-            self.set_scene(SCENE_LOSS)
-            self.set_text(TEXT_STATUS, "Better luck next time!")
-        print(f"[OBS] Result screen -> {'Win' if won else 'Loss'}")

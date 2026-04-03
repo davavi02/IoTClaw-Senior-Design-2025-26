@@ -20,13 +20,12 @@ headers = {"Authorization": f"Bearer {JWT}"}
 class Events:
     time = 0
     active = False
-    status = 0
     movement = False
 game = Events()
 messages = queue.Queue()
 obs = OBSManager()
 
-def timerManager(game, length):
+def timerManager(game, length, messages):
     game.time = length
     while game.time > 0 and game.active:
         print("Timer", game.time)
@@ -39,12 +38,11 @@ def timerManager(game, length):
             game.movement = True
         time.sleep(1)
         game.time -= 1
-    obs.set_text("Timer Text", "Timer: " + str(0))
+    obs.set_text("Timer Text", "Play Time: " + str(0))
     if game.active:
         game.active = False
         print("Timer ran out, checking for prize...")
-        moveClaw()
-        dropClawAndDetect(messages, game)
+        dropClawAndDetect(game, messages)
 
 
 def parseMessages(websocket):
@@ -53,28 +51,24 @@ def parseMessages(websocket):
                 # Unpack binary data and get number
                 message = struct.unpack("B", message)[0]
                 print(message)
-                if game.active and game.movement:
+                if message == 6:
+                    obs.toggle_camera()
+                elif message == 7 and not game.active:
+                    game.active = True
+                    print("Starting Game")
+                    move_thread = threading.Thread(target=moveClaw, args=(message,))
+                    move_thread.start()
+                    timer_thread = threading.Thread(target=timerManager, args=(game, 25, messages))
+                    timer_thread.start()
+                elif game.movement and game.active:
                     if message >= 0 and message <= 4:
                         move_thread = threading.Thread(target=moveClaw, args=(message,))
                         move_thread.start()
                     elif message == 5:
                         game.active = False
                         print("Ending game, checking for prize...")
-                        detect_thread = threading.Thread(target=dropClawAndDetect, args=(messages, game))
+                        detect_thread = threading.Thread(target=dropClawAndDetect, args=(game, messages))
                         detect_thread.start()
-                    elif message == 6:
-                        obs.toggle_camera()
-                elif message == 6:
-                    obs.toggle_camera()
-                else:
-                    if message == 7 and game.status == 0 and game.active == False:
-                        game.active = True
-                        game.status == 1
-                        print("Starting Game")
-                        move_thread = threading.Thread(target=moveClaw, args=(message,))
-                        move_thread.start()
-                        timer_thread = threading.Thread(target=timerManager, args=(game, 25))
-                        timer_thread.start()
 
 def sendMessages(websocket, messages):
     while True:        
@@ -83,12 +77,12 @@ def sendMessages(websocket, messages):
             message = messages.get()
             message = struct.pack("B", message)
             websocket.send(message, text=False)
-            print("Sent:", message)
+            print("Sent:", struct.unpack("B", message)[0])
             if message == 1 or message == 0:
                 time.sleep(3)
                 message = struct.pack("B", int(2))
                 websocket.send(message, text=False)
-                print("Sent:", message)
+                print("Sent:", struct.unpack("B", message)[0])
 
 def main():
     while True:

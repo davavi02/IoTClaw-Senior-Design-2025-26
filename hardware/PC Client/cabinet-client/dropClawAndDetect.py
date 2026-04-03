@@ -5,7 +5,8 @@ import numpy as np
 import time
 from moveClaw import moveClaw
 
-def dropClawAndDetect(messages, game):
+def dropClawAndDetect(game, messages):
+    game.movement = False
     print("Dropping and Detecting")
     moveClaw(5)
     time.sleep(6)
@@ -40,6 +41,8 @@ def dropClawAndDetect(messages, game):
             tries -= 1
         cap.release()
     except Exception:
+        time.sleep(3)
+        game.active = 0
         raise Exception
     else:
         game.active = 0
