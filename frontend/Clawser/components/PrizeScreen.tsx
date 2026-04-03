@@ -1,30 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
-  Image,
-  Text,
-  TouchableOpacity,
-  FlatList
+  FlatList, Text
 } from 'react-native';
 import { useAuthStore } from '../stores/AuthStore';
 import { PrizeProps } from './Routes';
-import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNavBar from '../components/BottomNavBar';
 import HeaderBar from '../components/HeaderBar';
 import PrizeCard from '../components/PrizeCard'
-import Pxbkg from "../assets/pixbkg.png";
-import { MOCK_PRIZES } from '../data/mockPrizes';
+import Background from './Background';
+import { Prize } from '../types/prize';
+import { callProtectedRoute } from '../services/ApiService';
 
-import { ImageBackground } from "react-native";
-import CoinsButton from '../components/CoinsButton.tsx';
 
 const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
-  const { user, signOut } = useAuthStore();
+  const [prizes, setPrizes] = useState<Prize[]>([]);
+
+  useEffect(() => {
+    const getPrizes = async () => {
+      try {
+        const response = await callProtectedRoute('/api/prizes', {
+           method: 'GET'
+          });
+          console.log("Server Status Code:", response.status);
+        if (response.ok){
+          const data = await response.json();
+          setPrizes(data.prizes);
+
+          if (data.prizes && data.prizes.length > 0) {
+            setPrizes(data.prizes);
+          } else {
+            setPrizes(data.prizes);
+            console.log("Server returned an empty prize array");
+          }
+        } else {
+          const errorText = await response.text();
+          console.log("Server Error Text:", errorText);
+        }
+      } catch (error) {
+        console.error("Failed to load prizes: ", error);
+      }
+    };
+
+    getPrizes();
+  }, []);
+
 
   return (
-    <SafeAreaView style={styles.root} edges={['none']}>
-      <ImageBackground source={Pxbkg} style={styles.bg} resizeMode="cover">
+    <Background>
         <View style={styles.screen}>
           {/* CONTENT AREA (NON-SCROLLING) */}
           <View style={styles.main}>
@@ -34,14 +58,15 @@ const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
             </View>
 
             {/* Prize Cards */}
-            <View style={styles.prizeCardsArea}>
+
+            {prizes.length ? (<View style={styles.prizeCardsArea}>
                 <FlatList
-                        data={MOCK_PRIZES}
-                        keyExtractor={(item) => item.id}
+                        data={prizes}
+                        keyExtractor={(item) => item.dateWon}
                         renderItem={({ item }) => <PrizeCard prize={item} />}
                         contentContainerStyle={{ marginVertical: 0 }}
                       />
-            </View>
+            </View>) : (<Text style={styles.errText}>No prizes won yet!!</Text>)}
           </View>
 
           {/* FIXED BOTTOM NAVBAR */}
@@ -52,8 +77,7 @@ const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
             onPressProfile={() => navigation.navigate("Profile", { from: "Prize" })}
           />
         </View>
-      </ImageBackground>
-    </SafeAreaView>
+    </Background>
   );
 };
 
@@ -80,6 +104,14 @@ const styles = StyleSheet.create({
     // flex: 1 means "take all remaining space above the navbar"
     flex: 1,
     // add padding/margins if you want
+  },
+
+  errText: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
 
   headerWrapper: {
