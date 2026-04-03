@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"time"
 )
 
 type UserTokenData struct {
@@ -33,4 +35,33 @@ func GetUserTokenDataTrx(ctx context.Context, trx *sql.Tx, uid int64) *UserToken
 	}
 
 	return data
+}
+
+func PayTokens(tokenAmt int64, uid int64, server *Server) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	trx, err := server.dbMan.BeginTransaction(ctx)
+	if err != nil || trx == nil {
+		return err
+	}
+	defer trx.Rollback()
+
+	res, err := trx.ExecContext(ctx, `UPDATE CoinTotals 
+        SET Coins = Coins - ? WHERE UID = ? AND Coins >= ?`, tokenAmt, uid, tokenAmt)
+
+	if err != nil {
+		return err
+	}
+
+	num, err := res.RowsAffected()
+	if err != nil || num == 0 {
+		return errors.New("Insufficient coins or database does not support.")
+	}
+	err = trx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

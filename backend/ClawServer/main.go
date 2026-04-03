@@ -14,7 +14,7 @@ func generateTestJWT() {
 		}
 		fmt.Printf("Token #%v: %v\n", i, token)
 	}
-	token, err := createToken(int64(0), false, true)
+	token, err := createToken(int64(1), false, true)
 	if err != nil {
 		return
 	}

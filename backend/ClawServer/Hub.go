@@ -6,6 +6,8 @@
 
 package main
 
+import "fmt"
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -34,9 +36,11 @@ type Hub struct {
 
 	//USed to delete the game from the list when we are done.
 	activeGames *ActiveGames
+
+	server *Server
 }
 
-func newHub(container *ActiveGames, gameData *GameData) *Hub {
+func newHub(container *ActiveGames, gameData *GameData, srv *Server) *Hub {
 	return &Hub{
 		broadcast:       make(chan *Packet),
 		register:        make(chan *Client),
@@ -47,6 +51,7 @@ func newHub(container *ActiveGames, gameData *GameData) *Hub {
 		activeGames:     container,
 		cabinent:        nil,
 		queue:           CreateQueue(),
+		server:          srv,
 	}
 }
 
@@ -147,8 +152,14 @@ func (h *Hub) handleServerMessage(message *Packet) {
 	case 2:
 		//Ready lets swap the queue
 		h.RemoveFromQueue(nil)
-		if h.queue.GetFrontQueue() != nil {
+		cli := h.queue.GetFrontQueue()
+		if cli != nil {
 			//Send the coin token its play time..
+			uid, _ := cli.jwtData.GetUserIdAsInt64()
+			coinErr := PayTokens(cli.hub.gameData.CoinCost, uid, h.server)
+			if coinErr != nil {
+				fmt.Printf("Error paying tokens: %v\n", coinErr)
+			}
 			h.outboundMessage <- NewPacketUInt8(7, message.Sender)
 		}
 	}
@@ -160,6 +171,13 @@ func (h *Hub) joinQueue(c *Client) {
 	if place == 1 {
 		//That means queue was idle send ready token.
 		if h.cabinent != nil {
+
+			cli := h.queue.GetFrontQueue()
+			uid, _ := cli.jwtData.GetUserIdAsInt64()
+			coinErr := PayTokens(cli.hub.gameData.CoinCost, uid, h.server)
+			if coinErr != nil {
+				fmt.Printf("Error paying tokens: %v\n", coinErr)
+			}
 			h.outboundMessage <- NewPacketUInt8(7, h.cabinent)
 		}
 	}

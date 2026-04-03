@@ -424,7 +424,7 @@ func (server *Server) handleCreateGameRoom(w http.ResponseWriter, r *http.Reques
 		return
 	}*/
 
-	if server.rooms.CreateGame(gameData) {
+	if server.rooms.CreateGame(gameData, server) {
 		//http.Error(w, "Game creation issue", http.StatusInternalServerError)
 		fmt.Println("Room already created..")
 	}

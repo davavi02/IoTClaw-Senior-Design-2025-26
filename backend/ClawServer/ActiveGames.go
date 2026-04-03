@@ -18,7 +18,7 @@ func InitializeGamerooms() *ActiveGames {
 	return &ActiveGames{activeGame: make(map[string]*Hub)}
 }
 
-func (container *ActiveGames) CreateGame(game *GameData) bool {
+func (container *ActiveGames) CreateGame(game *GameData, srv *Server) bool {
 	container.Lock()
 	defer container.Unlock()
 
@@ -27,7 +27,7 @@ func (container *ActiveGames) CreateGame(game *GameData) bool {
 		return ok
 	}
 
-	hub := newHub(container, game)
+	hub := newHub(container, game, srv)
 	container.activeGame[game.Name] = hub
 	go hub.run()
 	return false
