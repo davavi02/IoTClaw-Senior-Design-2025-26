@@ -1,23 +1,20 @@
 import React, { useEffect } from "react";
 import {
-  ImageBackground,
   View,
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
-  Switch,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
 import Background from "./Background";
 import HeaderBar from "./HeaderBar";
 import useWebsocketStore from "../stores/WebsocketStore";
-import PlayDirectionalButtons from "./PlayDirectionalButtons";
-import DropClawButton from "./DropClawButton";
 import arcadeMachine from "../assets/ArcadeBackground.png";
 import SwitchCameraButton from "./SwitchCameraButton";
+import { OutgoingMessages } from "../types/OutgoingMessages";
+import ArcadeControllerView from "./ArcadeControllerView";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,10 +25,11 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
   const connect = useWebsocketStore((state) => state.connectToServer);
   const disconnect = useWebsocketStore((state) => state.disconnect);
-  const sendBytes = useWebsocketStore((state) => state.sendBytes);
+  //const sendBytes = useWebsocketStore((state) => state.sendBytes);
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const lastMessage = useWebsocketStore((state) => state.lastMessage);
   const lastError = useWebsocketStore((state) => state.lastError);
+  const send = useWebsocketStore((state) => state.sendCommand);
 
   useEffect(() => {
     connect(WS_URL);
@@ -41,41 +39,6 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
       disconnect();
     };
   }, [WS_URL, connect, disconnect]);
-
-  const cancelMove = () => {
-    if (!isConnected) return;
-    sendBytes([0]);
-  };
-
-  const handleMoveUp = () => {
-    if (!isConnected) return;
-    sendBytes([1]);
-  };
-
-  const handleMoveDown = () => {
-    if (!isConnected) return;
-    sendBytes([2]);
-  };
-
-  const handleMoveLeft = () => {
-    if (!isConnected) return;
-    sendBytes([3]);
-  };
-
-  const handleMoveRight = () => {
-    if (!isConnected) return;
-    sendBytes([4]);
-  };
-
-  const coinButton = () => {
-    if (!isConnected) return;
-    sendBytes([7]);
-  };
-
-  const switchCamera = () => {
-    if (!isConnected) return;
-    sendBytes([6]);
-  };
 
   return (
     <Background>
@@ -113,26 +76,17 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
             {/* Top layer: controls */}
             <View style={styles.controlsContainer}>
+
+              
               <View style={styles.switchCameraWrap}>
-                <SwitchCameraButton onPress={switchCamera} size={width*0.22}></SwitchCameraButton>
+                <SwitchCameraButton onPress={()=>{send(OutgoingMessages.ChangeCamera)}} size={width*0.22}/>
               </View>
 
 
               <View style={styles.controlsOverlay}>
-                <View style={styles.dropButtonWrap}>
-                  <DropClawButton onPress={coinButton} size={width*0.3} />
-                </View>
-
-                <View style={styles.directionalButtonsWrap}>
-                  <PlayDirectionalButtons
-                    pressUp={handleMoveUp}
-                    pressDown={handleMoveDown}
-                    pressLeft={handleMoveLeft}
-                    pressRight={handleMoveRight}
-                    cancelMove={cancelMove}
-                  />
-                </View>
+                <ArcadeControllerView width={width}/>
               </View>
+
             </View>
           </View>
 
@@ -239,18 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  directionalButtonsWrap: {
 
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-
-  dropButtonWrap: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 40,
-  },
 
   switchCameraWrap: {
     width: "100%",

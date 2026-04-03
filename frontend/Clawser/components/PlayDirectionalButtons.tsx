@@ -10,6 +10,8 @@ import downButtonPressed from "../assets/DpadButtonImages/DownButtonPressed.png"
 import downButtonUnpressed from "../assets/DpadButtonImages/DownButtonUnpressed.png";
 import upButtonPressed from "../assets/DpadButtonImages/UpButtonPressed.png";
 import upButtonUnpressed from "../assets/DpadButtonImages/UpButtonUnpressed.png";
+import { OutgoingMessages } from "../types/OutgoingMessages";
+
 
 const DPAD_SIZE = 170;
 
@@ -31,26 +33,18 @@ const PTS = {
 type Direction = "up" | "down" | "left" | "right";
 
 type PlayDirectionalButtonsProps = {
-  pressUp: () => void;
-  pressDown: () => void;
-  pressLeft: () => void;
-  pressRight: () => void;
-  cancelMove: () => void;
 };
 
-const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
-  pressUp,
-  pressDown,
-  pressLeft,
-  pressRight,
-  cancelMove,
-}) => {
+const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({}) => {
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const [pressed, setPressed] = useState<Direction | null>(null);
   const [leftPressed, setLeftPressed] = useState(false);
   const [rightPressed, setRightPressed] = useState(false);
   const [upPressed, setUpPressed] = useState(false);
   const [downPressed, setDownPressed] = useState(false);
+
+  const send = useWebsocketStore((state) => state.sendCommand);
+
 
   const handlePressIn = (direction: Direction) => {
     if (!isConnected) return;
@@ -59,28 +53,28 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
 
     switch (direction) {
       case "up":
-        pressUp();
+        send(OutgoingMessages.Up);
         setUpPressed(true);
         setDownPressed(false);
         setLeftPressed(false);
         setRightPressed(false);
         break;
       case "down":
-        pressDown();
+        send(OutgoingMessages.Down);
         setDownPressed(true);
         setUpPressed(false);
         setLeftPressed(false);
         setRightPressed(false);
         break;
       case "left":
-        pressLeft();
+        send(OutgoingMessages.Left);
         setLeftPressed(true);
         setUpPressed(false);
         setDownPressed(false);
         setRightPressed(false);
         break;
       case "right":
-        pressRight();
+        send(OutgoingMessages.Right);
         setRightPressed(true);
         setUpPressed(false);
         setDownPressed(false);
@@ -97,7 +91,7 @@ const PlayDirectionalButtons: React.FC<PlayDirectionalButtonsProps> = ({
     setLeftPressed(false);
     setRightPressed(false);
     setUpPressed(false);
-    cancelMove();
+    send(OutgoingMessages.StopMovement);
   };
 
   return (

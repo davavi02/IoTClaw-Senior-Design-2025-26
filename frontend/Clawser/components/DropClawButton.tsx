@@ -3,8 +3,11 @@ import { Pressable, Image, Text, StyleSheet, ViewStyle } from "react-native";
 import dropButtonPressed from "../assets/DropButtonPressed.png";
 import dropButtonUnpressed from "../assets/DropButtonUnpressed.png";
 
+import useWebsocketStore from "../stores/WebsocketStore";
+import { OutgoingMessages } from "../types/OutgoingMessages";
+
+
 type DropClawButtonProps = {
-  onPress: () => void;
   disabled?: boolean;
   C_UNPRESSED?: string;
   C_PRESSED?: string;
@@ -13,7 +16,6 @@ type DropClawButtonProps = {
 };
 
 const DropClawButton: React.FC<DropClawButtonProps> = ({
-  onPress,
   disabled = false,
   C_UNPRESSED = "#2f15a1",
   C_PRESSED = "#00e5ff",
@@ -21,10 +23,12 @@ const DropClawButton: React.FC<DropClawButtonProps> = ({
   size = 80,
 }) => {
   const [pressed, setPressed] = useState(false);
+  const send = useWebsocketStore((state) => state.sendCommand);
+
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={()=>{send(OutgoingMessages.DropClaw)}}
       disabled={disabled}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}

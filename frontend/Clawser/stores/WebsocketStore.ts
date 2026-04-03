@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
+import { OutgoingMessages } from '../types/OutgoingMessages';
 
 
 type BinaryMessage = ArrayBuffer | Uint8Array;
@@ -17,6 +18,7 @@ interface SocketStore {
     sendTextMessage: (message: string) => void;
     sendBinaryMessage: (message: BinaryMessage) => void;
     sendBytes: (bytes: number[]) => void;
+    sendCommand: (message: OutgoingMessages | number) => void;
 }
 
 
@@ -159,6 +161,12 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
     const uint8 = new Uint8Array(bytes);
     get().sendBinaryMessage(uint8);
   },
+
+  sendCommand: (message: OutgoingMessages | number) => {
+    const uint8 = new Uint8Array(message);
+    get().sendBinaryMessage(uint8);
+  },
+
 }));
 
 export default useWebsocketStore;
