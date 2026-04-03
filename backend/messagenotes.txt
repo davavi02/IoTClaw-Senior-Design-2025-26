@@ -1,0 +1,20 @@
+Client message to backend..
+
+0-Stop 
+1-up
+2-down
+3-left
+4-right
+5-dropclaw
+6-change camera
+8-uprelease
+9-downrelease
+10-leftrelease
+11-rightrelease
+12-dropclawrelease
+200-JoinQueue
+204-LeaveQueue
+205-PlayBegin
+
+
+
