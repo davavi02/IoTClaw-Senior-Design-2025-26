@@ -6,7 +6,7 @@ import Polaroid from "./Polaroid";
 
 type CabCardProps = {
   data: CabinentData;
-  onPressCallback: (name: string) => void;
+  onPressCallback: (cData: CabinentData) => void;
 };
 
 const CabinentCard: React.FC<CabCardProps> = ({ data, onPressCallback }) => {
@@ -21,10 +21,10 @@ const CabinentCard: React.FC<CabCardProps> = ({ data, onPressCallback }) => {
 
         <View style={styles.info}>
           <View style={styles.topBlock}>
-            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.name}>{data.name}</Text>
             <View style={styles.nameUnderline} />
             <Text style={styles.description} numberOfLines={3}>
-              {description}
+              {data.description}
             </Text>
           </View>
 
@@ -33,7 +33,7 @@ const CabinentCard: React.FC<CabCardProps> = ({ data, onPressCallback }) => {
             
             <TouchableOpacity 
               style={styles.playbtn} 
-              onPress={() => onPressCallback(name)}
+              onPress={() => onPressCallback(data)}
             >
               <Text style={styles.btnText}>Play!</Text>
             </TouchableOpacity>

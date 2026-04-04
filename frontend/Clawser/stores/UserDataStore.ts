@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { callProtectedRoute } from '../services/ApiService';
 
 interface UserData {
   username: string;
@@ -7,9 +8,10 @@ interface UserData {
   setUserData: (username: string, tokens: number) => void;
   setTokens: (num: number) => void;
   clearUserData: () => void;
+  updateTokens: () => Promise<void>;
 }
 
-const useUserDataStore = create<UserData>()((set) => ({
+const useUserDataStore = create<UserData>()((set, get) => ({
   username: "",
   numTokens: 0,
 
@@ -23,7 +25,28 @@ const useUserDataStore = create<UserData>()((set) => ({
 
   clearUserData: () => {
     set({ username: "", numTokens: 0 });
+  },
+
+  updateTokens: async () => {
+          try {
+            const response = await callProtectedRoute('/api/tokens', {
+               method: 'GET' 
+              });
+              console.log("Server Status Code:", response.status);
+    
+            if (response.ok){
+
+              const data = await response.json();
+              get().setTokens(data.tokens);
+            } else {
+              const errorText = await response.text();
+              console.log("Server Error Text:", errorText);
+            }
+          } catch (error) {
+            console.error("Failed to update tokens.", error);
+          }
   }
+  
 }));
 
 

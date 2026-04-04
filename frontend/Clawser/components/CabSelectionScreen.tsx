@@ -44,8 +44,8 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
     getCabData();
   }, []);
 
-  const playCabinent = (title: string) => {
-    navigation.navigate('Play', { cab: title });
+  const playCabinent = (cData: CabinentData) => {
+    navigation.navigate('Play', { cab: cData });
   }
 
 

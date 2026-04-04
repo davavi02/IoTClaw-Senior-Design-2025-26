@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { OutgoingMessages } from '../types/OutgoingMessages';
+import { IncomingMessages } from '../types/IncomingMessage';
 
 
 type BinaryMessage = ArrayBuffer | Uint8Array;
@@ -11,6 +12,8 @@ interface SocketStore {
     streamUrl: string | null;
     lastMessage: string | ArrayBuffer | null;
     lastError: string | null;
+    queuePosition: number | null;
+    notificationMessage: number | null;
 
     connectToServer: (URL: string) => Promise<void>;
     disconnect: (code?: number, reason?: string) => void;
@@ -23,14 +26,17 @@ interface SocketStore {
 
 
 const useWebsocketStore = create<SocketStore>()((set, get) => ({
-   webSocket: null,
-   isConnected: false,
-   streamUrl: null,
-   lastMessage: null,
-    lastError: null,
+  webSocket: null,
+  isConnected: false,
+  streamUrl: null,
+  lastMessage: null,
+  lastError: null,
+  queuePosition: null,
+  notificationMessage: null,
    
   connectToServer: async (URL: string) => {
     const { webSocket, isConnected } = get();
+    set({queuePosition: null, notificationMessage: null});
 
     if (isConnected || webSocket) {
       console.log('WebSocket already connected or connecting.');
@@ -75,6 +81,17 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
 
           // Example: inspect received bytes
           const bytes = new Uint8Array(data);
+          if (bytes.length > 0) {
+            var message = bytes[0];
+            if(message <= 120 && message >= 0){
+              set({queuePosition: message});
+            } else if (message < 250 && message >= 200){
+              if(message === IncomingMessages.Loss || message === IncomingMessages.Win) {
+                set({queuePosition: null});
+              }
+              set({notificationMessage: message});
+            }
+          }
           console.log('Received bytes:', bytes);
           return;
         }
@@ -96,6 +113,8 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
           webSocket: null,
           isConnected: false,
           streamUrl: null,
+          notificationMessage: null,
+          queuePosition: null,
         });
       };
 
@@ -109,6 +128,8 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
         webSocket: null,
         isConnected: false,
         streamUrl: null,
+        notificationMessage: null,
+        queuePosition: null,
       });
     }
   },

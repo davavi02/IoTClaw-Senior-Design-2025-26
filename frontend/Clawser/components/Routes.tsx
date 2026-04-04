@@ -12,6 +12,7 @@ import PrizeTrackingScreen from './PrizeTrackingScreen';
 import PlayScreen from './PlayScreen';
 import CabSelectionScreen from './CabSelectionScreen';
 import { useAuthStore } from '../stores/AuthStore';
+import { CabinentData } from '../types/CabinentData';
 
 /// To add a routes theres some things you gotta do... I'll even comment 1, 2, 3, 4 so you can see the steps
 /// First: For each route add its param types to stackparamlist, if no params go undefined like I did.
@@ -30,7 +31,7 @@ type StackParamList = {
   EditProfile: undefined;
   ReportError: undefined;
   PrizeTracking: undefined;
-  Play: { cab: string };
+  Play: { cab: CabinentData };
   CabSelect: undefined;
 };
 

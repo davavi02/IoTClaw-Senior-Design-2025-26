@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  TouchableOpacity
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
@@ -15,13 +16,16 @@ import arcadeMachine from "../assets/ArcadeBackground.png";
 import SwitchCameraButton from "./SwitchCameraButton";
 import { OutgoingMessages } from "../types/OutgoingMessages";
 import ArcadeControllerView from "./ArcadeControllerView";
+import useUserDataStore from "../stores/UserDataStore";
+import JoinQueueView from "./JoinQueueView";
+import WaitingInQueueView from "./WaitingInQueueView";
 
 const { width, height } = Dimensions.get("window");
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const { cab } = route.params;
-  const STREAM_URL = "http://video-server.babid.net:8889/" + cab;
-  const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab;
+  const STREAM_URL = "http://video-server.babid.net:8889/" + cab.name;
+  const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab.name;
 
   const connect = useWebsocketStore((state) => state.connectToServer);
   const disconnect = useWebsocketStore((state) => state.disconnect);
@@ -29,6 +33,8 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const lastMessage = useWebsocketStore((state) => state.lastMessage);
   const lastError = useWebsocketStore((state) => state.lastError);
+  const notificationMessage = useWebsocketStore((state) => state.notificationMessage);
+  const queuePos = useWebsocketStore((state) => state.queuePosition);
   const send = useWebsocketStore((state) => state.sendCommand);
 
   useEffect(() => {
@@ -77,15 +83,16 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
             {/* Top layer: controls */}
             <View style={styles.controlsContainer}>
 
-              
-              <View style={styles.switchCameraWrap}>
-                <SwitchCameraButton onPress={()=>{send(OutgoingMessages.ChangeCamera)}} size={width*0.22}/>
-              </View>
-
-
-              <View style={styles.controlsOverlay}>
-                <ArcadeControllerView width={width}/>
-              </View>
+                <View style={styles.switchCameraWrap}>
+                  { ((queuePos !== null) && (queuePos <= 1)) &&
+                    <SwitchCameraButton onPress={()=>{send(OutgoingMessages.ChangeCamera)}} size={width*0.22}/>}
+                </View>
+                
+                <View style={styles.controlsOverlay}>
+                    { (queuePos === null) ? (<JoinQueueView cabCost={cab.cost}/>)
+                        : (queuePos <= 1) ? (<ArcadeControllerView width={width}/>) : (<WaitingInQueueView/>)
+                    }
+                </View>
 
             </View>
           </View>
@@ -215,4 +222,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "center",
   },
+
 });

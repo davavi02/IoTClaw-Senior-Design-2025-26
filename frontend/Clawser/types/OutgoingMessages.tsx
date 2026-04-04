@@ -6,5 +6,6 @@ export enum OutgoingMessages {
   Right = 4,
   DropClaw = 5,
   ChangeCamera = 6,
-  JoinQueue = 200
+  JoinQueue = 200,
+  LeaveQueue = 204
 }
