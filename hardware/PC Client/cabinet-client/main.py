@@ -22,6 +22,7 @@ class Events:
     time = 0
     active = False
     movement = False
+    disconnect = False
 game = Events()
 messages = queue.Queue()
 obs = OBSManager()
@@ -41,8 +42,23 @@ def timerManager(game, length, messages):
         game.time -= 1
     obs.set_text("Timer Text", "Play Time: " + str(0))
     game.movement = False
-    print("Ending game, checking for prize...")
-    dropClawAndDetect(messages)
+    if not game.disconnect:
+        print("Ending game, checking for prize...")
+        dropClawAndDetect(messages)
+
+def handleDisconnect(game, messages):
+    game.movement = False
+    game.time = 0
+    moveClaw(4)
+    time.sleep(1)
+    moveClaw(0)
+    moveClaw(5)
+    time.sleep(1)
+    moveClaw(0)
+    time.sleep(5)
+    game.active = False
+    game.disconnect = False
+    messages.put(2)
 
 def parseMessages(websocket):
     global game, messages
@@ -50,7 +66,10 @@ def parseMessages(websocket):
                 # Unpack binary data and get number
                 message = struct.unpack("B", message)[0]
                 print(message)
-                if message == 6:
+                if message == 203:
+                    game.disconnect = True
+                    handleDisconnect(game, messages)
+                elif message == 6:
                     obs.toggle_camera()
                 elif message == 7 and not game.active:
                     game.active = True
