@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"time"
 )
 
 type Queue struct {
@@ -28,6 +29,7 @@ func (q *Queue) GetFrontQueue() *Client {
 	return nil
 }
 
+// False means already was in queue and was dcd. stop the timer if so
 func (q *Queue) AddToQueue(cli *Client) (bool, uint8) {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
@@ -53,7 +55,7 @@ func (q *Queue) AddToQueue(cli *Client) (bool, uint8) {
 }
 
 // Pass nil to remove the front. trying to save time.
-func (h *Hub) RemoveFromQueue(cli *Client) {
+func (h *Hub) RemoveFromQueue(cli *Client) (isNull bool) {
 	q := h.queue
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
@@ -69,7 +71,8 @@ func (h *Hub) RemoveFromQueue(cli *Client) {
 				h.outboundMessage <- NewPacketUInt8(uint8(x), cli)
 			}
 		}
-		return
+		h.qDCTimer.Stop()
+		return false
 	}
 
 	id := cli.jwtData.UserId
@@ -80,7 +83,8 @@ func (h *Hub) RemoveFromQueue(cli *Client) {
 		if cli == q.QueueMap[q.JWTClientQueue[0]] {
 			//First.
 			q.QueueMap[id] = nil
-			return
+			h.qDCTimer.Reset(time.Minute)
+			return true
 		} else {
 			for i, queuedID := range q.JWTClientQueue {
 				if queuedID == cli.jwtData.UserId {
@@ -94,4 +98,5 @@ func (h *Hub) RemoveFromQueue(cli *Client) {
 			}
 		}
 	}
+	return false
 }

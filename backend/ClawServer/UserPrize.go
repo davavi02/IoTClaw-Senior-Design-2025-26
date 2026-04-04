@@ -57,3 +57,27 @@ func GetUserPrizesForUID(ctx context.Context, db *sql.DB, uid int64) ([]UserPriz
 	}
 	return out, rows.Err()
 }
+
+func AwardPrize(prizeId int64, uid int64, server *Server) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	trx, err := server.dbMan.BeginTransaction(ctx)
+	if err != nil || trx == nil {
+		return err
+	}
+	defer trx.Rollback()
+
+	_, err = trx.ExecContext(ctx, `INSERT INTO UserPrize (PID, UID) VALUES (?,?)`, prizeId, uid)
+
+	if err != nil {
+		return err
+	}
+
+	err = trx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

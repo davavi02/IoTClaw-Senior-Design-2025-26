@@ -28,9 +28,16 @@ func (container *ActiveGames) CreateGame(game *GameData, srv *Server) bool {
 	}
 
 	hub := newHub(container, game, srv)
+	hub.qDCTimer.Stop()
 	container.activeGame[game.Name] = hub
 	go hub.run()
 	return false
+}
+
+func (container *ActiveGames) DeleteRoom(s string) {
+	container.Lock()
+	defer container.Unlock()
+	delete(container.activeGame, s)
 }
 
 func (container *ActiveGames) DoesGameExist(game *GameData) bool {
