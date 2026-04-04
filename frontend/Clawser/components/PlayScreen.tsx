@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
   },
 
   headerOverlay: {
-    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -131,31 +130,29 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 0,
   },
 
   machineArea: {
-    position: "relative",
-    width: width,
-    height: Math.min(height * 0.75, 760),
+    flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
   },
 
   streamWrap: {
     position: "absolute",
-    top: 100,
+    left: 0, right: 0, top: 0, bottom: 0,
     alignItems: "center",
     zIndex: 1,
   },
 
   streamFrame: {
-    width: Math.min(width * 0.8, 420),
-    aspectRatio: 100 / 135,
-    top: 30,
+    height: height*.51,
+    aspectRatio: 44/66,
+    top: height * .080,
+    marginLeft: 3.5,
     borderRadius: 12,
     overflow: "hidden",
-    borderWidth: 4,
+    borderWidth: 1,
     borderColor: "rgba(0, 229, 255, 0.96)",
     backgroundColor: "#000",
     zIndex: 2,
@@ -168,42 +165,43 @@ const styles = StyleSheet.create({
   
   arcadeOverlay: {
     position: "absolute",
-    top: 0,
-    flex: 1,
-    width: "100%",
-    height: Math.min(height * 0.89, 1760),
+    left: 0, right: 0, top: 0, bottom: 0,
+    alignItems: "center",
     zIndex: 5,
   },
 
   arcadeImage: {
-    width: "100%",
     height: "100%",
-    resizeMode: "stretch",
+    aspectRatio: 1,
+    resizeMode: "contain",
   },
 
   controlsContainer: {
     position: "absolute",
     left: 0,
     right: 0,
-    top: height * 0.57,
-    width: width,
+    top: height * 0.55,
+    bottom: 0,
+    //width: width,
     zIndex: 10,
-    flex: 1,
-    justifyContent: "center",
+    //flex: 1,
+    justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 24,
+    //paddingHorizontal: 24,
+    paddingBottom: "4%",
   },
 
   controlsOverlay: {
-    width: width * 0.8,
+    //flex: 1,
+    height: height * .25,
+    width: height * 0.42,
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingTop: "80%",
   },
 
-
-
   switchCameraWrap: {
-    width: "100%",
+    flex: 1,
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: "10%",
