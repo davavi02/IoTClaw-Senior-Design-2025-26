@@ -163,7 +163,7 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
   },
 
   sendCommand: (message: OutgoingMessages | number) => {
-    const uint8 = new Uint8Array(message);
+    const uint8 = new Uint8Array([message]);
     get().sendBinaryMessage(uint8);
   },
 
