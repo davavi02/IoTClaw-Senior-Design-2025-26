@@ -7,7 +7,7 @@ from moveClaw import moveClaw
 
 def dropClawAndDetect(messages):
     print("Dropping and Detecting")
-    moveClaw(5)
+    moveClaw(5, 0)
     time.sleep(6)
     try:
         dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)

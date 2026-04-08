@@ -26,6 +26,7 @@ class Events:
 game = Events()
 messages = queue.Queue()
 obs = OBSManager()
+CURRENT_VIEW = None
 
 def timerManager(game, length, messages):
     game.time = length
@@ -49,19 +50,19 @@ def timerManager(game, length, messages):
 def handleDisconnect(game, messages):
     game.movement = False
     game.time = 0
-    moveClaw(4)
+    moveClaw(4, CURRENT_VIEW)
     time.sleep(1)
-    moveClaw(0)
-    moveClaw(5)
+    moveClaw(0, CURRENT_VIEW)
+    moveClaw(5, CURRENT_VIEW)
     time.sleep(1)
-    moveClaw(0)
+    moveClaw(0, CURRENT_VIEW)
     time.sleep(5)
     game.active = False
     game.disconnect = False
     messages.put(2)
 
 def parseMessages(websocket):
-    global game, messages
+    global game, messages, CURRENT_VIEW
     for message in websocket:
                 # Unpack binary data and get number
                 message = struct.unpack("B", message)[0]
@@ -70,21 +71,22 @@ def parseMessages(websocket):
                     game.disconnect = True
                     handleDisconnect(game, messages)
                 elif message == 6:
-                    obs.toggle_camera()
+                    CURRENT_VIEW = obs.toggle_camera()
                 elif message == 7 and not game.active:
                     game.active = True
                     print("Starting Game")
-                    move_thread = threading.Thread(target=moveClaw, args=(message,))
+                    move_thread = threading.Thread(target=moveClaw, args=(message, CURRENT_VIEW))
                     move_thread.start()
                     timer_thread = threading.Thread(target=timerManager, args=(game, 25, messages))
                     timer_thread.start()
                 elif game.movement and game.active:
                     if message >= 0 and message <= 4:
-                        move_thread = threading.Thread(target=moveClaw, args=(message,))
+                        move_thread = threading.Thread(target=moveClaw, args=(message, CURRENT_VIEW))
                         move_thread.start()
                     elif message == 5:
                         game.movement = False
-                        game.time = 0
+                        if game.time > 3:
+                            game.time = 0
 
 def sendMessages(websocket, game, messages):
     while True:        
@@ -115,4 +117,5 @@ def main():
 
 if __name__ == "__main__":
     obs.connect()
+    CURRENT_VIEW = obs.toggle_camera()
     main()

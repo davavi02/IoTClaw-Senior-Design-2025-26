@@ -84,3 +84,4 @@ class OBSManager:
         scene = CAMERA_SCENES[self.current_camera_index]
         self.set_scene(scene)
         print(f"[OBS] Camera toggled -> {scene}")
+        return self.current_camera_index
