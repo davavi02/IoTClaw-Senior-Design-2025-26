@@ -2,7 +2,6 @@
 # Talks to the MCU through Serial
 import serial
 import time
-import struct
 
 claw = serial.Serial("COM4", 115200)
 # 1, 2, 3, 4 = Up, Down Left, Right

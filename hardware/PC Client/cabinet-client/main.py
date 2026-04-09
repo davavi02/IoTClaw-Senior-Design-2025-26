@@ -85,7 +85,7 @@ def parseMessages(websocket):
                         move_thread.start()
                     elif message == 5:
                         game.movement = False
-                        if game.time > 3:
+                        if game.time > 2:
                             game.time = 0
 
 def sendMessages(websocket, game, messages):
