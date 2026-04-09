@@ -86,9 +86,9 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
         {/* FIXED BOTTOM NAVBAR */}
         <BottomNavBar
           active="profile"
-          onPressHome={() => navigation.navigate('Home')}
-          onPressMap={() => navigation.navigate('Prize')}
-          onPressProfile={() => navigation.navigate('Profile')}
+          onPressHome={() => navigation.navigate('Home', { from: 'Profile' })}
+          onPressMap={() => navigation.navigate('Prize', { from: 'Profile' })}
+          onPressProfile={() => navigation.navigate('Profile', { from: 'Profile' })}
         />
       </Background>
   );
