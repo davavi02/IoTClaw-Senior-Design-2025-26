@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   View,
+  Dimensions,
   StyleSheet,
   Image,
   Text,
@@ -18,6 +19,8 @@ import Pxbkg from "../assets/pixbkg.png";
 import PlayButton from "../assets/PlayButton.png";
 import CoinsButton from '../components/CoinsButton';
 import Background from './Background';
+const {width: windowWidth} = Dimensions.get("window");
+const {height: windowHeight} = Dimensions.get("window");
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { user, signOut } = useAuthStore();
@@ -116,17 +119,19 @@ const styles = StyleSheet.create({
   },
 
   topLogo: {
-    width: 400,
+    width: '80%',
     height: 140,
     position: 'absolute',
-    top: -70,
+    top: -windowHeight * 0.05,
     resizeMode: 'contain',
     zIndex: 3,
   },
 
   ribbonLeft: {
-    transform: [{ rotate: '-5.4deg' }],
+    transform: [{ rotate: '-25.4deg' }],
     position: 'absolute',
+    resizeMode: "contain",
+    width: "60%",
     top: 60,
     left: -30,
     zIndex: 1,
@@ -135,6 +140,8 @@ const styles = StyleSheet.create({
   ribbonRight: {
     transform: [{ rotate: '25.4deg' }],
     position: 'absolute',
+    resizeMode: "contain",
+    width: "60%",
     top: 60,
     right: -30,
     zIndex: 1,
@@ -148,8 +155,9 @@ const styles = StyleSheet.create({
   },
 
   clawImage: {
-    width: 800,                  // pick numbers that match your asset
-    height: 600,
+    marginTop: "20%",
+    width: Math.min(windowWidth * 0.75, 600),
+    height: Math.min(windowWidth * 1, 400),
     resizeMode: "contain",
   },
 

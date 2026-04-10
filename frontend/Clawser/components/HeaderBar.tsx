@@ -1,8 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
+import { View, Dimensions, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
+import Svg, { Polygon, Rect } from "react-native-svg";
 import { useNavigation } from '@react-navigation/native';
 import CoinsButton from './CoinsButton';
 import ClawzerTitle from '../assets/ClawzerTitle.png';
+import BackButton from '../assets/BackButton.png';
+const windowWidth = Dimensions.get("window").width;
+const backButtonWidth = windowWidth * 0.25;
+const backButtonHeight = backButtonWidth * 0.5;
 
 interface HeaderBarProps {
     useLogoInstead?: boolean; 
@@ -16,10 +21,13 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ useLogoInstead }) => {
         
         { useLogoInstead ? 
           (<Image source={ClawzerTitle} style={styles.topLogo}/>) :
-          (<TouchableOpacity onPress={() => navigation.goBack()}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-              <Text style={styles.backText}>← Back</Text>
-          </TouchableOpacity>)}
+          (<Svg width={backButtonWidth} height={backButtonHeight} viewBox={`0 0 ${backButtonWidth} ${backButtonHeight}`}>
+            <Image source={BackButton} style={styles.backButtonImage} />
+            <Polygon
+              points={`0,0 ${backButtonWidth},0 ${backButtonWidth},${backButtonHeight} 0,${backButtonHeight}`}
+              onPressIn={() => navigation.goBack()}
+            />
+          </Svg>)}
 
          <CoinsButton onPress={() => navigation.navigate('Shop')}/>
       </View>
@@ -47,8 +55,8 @@ const styles = StyleSheet.create({
   },
 
   topLogo: {
-    width: 133,
-    height: 45,
+    width: "50%",
+    height: "80%",
     resizeMode: 'contain',
   },
 
@@ -60,6 +68,12 @@ const styles = StyleSheet.create({
     color: '#00E5FF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  
+  backButtonImage: {
+    resizeMode: 'contain',
+    width: "100%",
+    height: "100%",
   },
 });
 
