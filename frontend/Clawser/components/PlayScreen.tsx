@@ -126,10 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
 
-  headerOverlay: {
-    opacity: 0,
-  },
-
   machineArea: {
     flex: 1,
     alignItems: "center",
@@ -170,9 +166,6 @@ const styles = StyleSheet.create({
   },
 
   arcadeImage: {
-    opacity: 0.5,
-    borderWidth: 3,
-    borderColor: "rgba(0, 229, 255, 0.96)",
     height: heightAfterHeader,
     width: width,
     resizeMode: "stretch",
