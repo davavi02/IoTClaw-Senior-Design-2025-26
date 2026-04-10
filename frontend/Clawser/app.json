@@ -90,7 +90,8 @@
         "expo-build-properties",
         {
           "android": {
-            "debugSigningConfig": {
+            "usesCleartextTraffic": true,
+            "signingConfig": {
               "storeFile": "../../credentials/debug.keystore",
               "storePassword": "android",
               "keyAlias": "androiddebugkey",
