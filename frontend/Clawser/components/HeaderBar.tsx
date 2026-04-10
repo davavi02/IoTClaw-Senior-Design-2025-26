@@ -11,13 +11,15 @@ const backButtonHeight = backButtonWidth * 0.5;
 
 interface HeaderBarProps {
     useLogoInstead?: boolean; 
+    height?: number; // Optional height prop to allow for dynamic header heights
 }
 
-const HeaderBar: React.FC<HeaderBarProps> = ({ useLogoInstead }) => {
+const HeaderBar: React.FC<HeaderBarProps> = ({ useLogoInstead, height }) => {
   const navigation = useNavigation();
+  const headerHeight = height || 91; // Default to 91 if height is not provided
   return (
     <View style={styles.headerWrapper}>
-      <View style={styles.headerOutline}>
+      <View style={[styles.headerOutline, { height: headerHeight }]}>
         
         { useLogoInstead ? 
           (<Image source={ClawzerTitle} style={styles.topLogo}/>) :
@@ -42,7 +44,6 @@ const styles = StyleSheet.create({
 
   headerOutline: {
     width: '100%',
-    height: 91,
     borderBottomWidth: 3,
     borderBottomColor: '#FF2F00',
     borderRadius: 0,

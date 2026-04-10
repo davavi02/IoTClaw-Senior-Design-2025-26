@@ -21,6 +21,7 @@ import JoinQueueView from "./JoinQueueView";
 import WaitingInQueueView from "./WaitingInQueueView";
 
 const { width, height } = Dimensions.get("window");
+const heightAfterHeader = height - (91 + 98); // Subtract header height for layout calculations
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const { cab } = route.params;
@@ -97,7 +98,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
             </View>
           </View>
 
-          <View style={styles.statusWrap}>
+          {/* <View style={styles.statusWrap}>
             {lastError ? (
               <Text style={styles.statusText}>Error: {lastError}</Text>
             ) : null}
@@ -105,7 +106,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
             {typeof lastMessage === "string" ? (
               <Text style={styles.statusText}>Last Message: {lastMessage}</Text>
             ) : null}
-          </View>
+          </View> */}
         </View>
       </View>
     </Background>
@@ -119,17 +120,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  headerOverlay: {
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 40,
-  },
-
   mainArea: {
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+  },
+
+  headerOverlay: {
+    opacity: 0,
   },
 
   machineArea: {
@@ -146,9 +144,10 @@ const styles = StyleSheet.create({
   },
 
   streamFrame: {
-    height: height*.51,
-    aspectRatio: 44/66,
-    top: height * .080,
+    height: heightAfterHeader*.58,
+    width: width * (11/15),
+    // aspectRatio: 44/60,
+    top: heightAfterHeader * .098,
     marginLeft: 3.5,
     borderRadius: 12,
     overflow: "hidden",
@@ -171,9 +170,12 @@ const styles = StyleSheet.create({
   },
 
   arcadeImage: {
-    height: "100%",
-    aspectRatio: 1,
-    resizeMode: "contain",
+    opacity: 0.5,
+    borderWidth: 3,
+    borderColor: "rgba(0, 229, 255, 0.96)",
+    height: heightAfterHeader,
+    width: width,
+    resizeMode: "stretch",
   },
 
   controlsContainer: {
