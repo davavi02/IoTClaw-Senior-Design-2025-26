@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "frontend",
+    "slug": "clawser-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/claw_icon.png",
@@ -109,8 +109,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "7e80f952-7b68-4219-ba95-a3f530cf4cd7"
+        "projectId": "dcc9c5bf-ec21-4d88-91a9-d2f9d64025d4"
       }
-    }
+    },
+    "owner": "clawser-sd2026"
   }
 }
