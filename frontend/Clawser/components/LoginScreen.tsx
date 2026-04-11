@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../stores/AuthStore';
@@ -15,6 +16,7 @@ import Background from './Background';
 
 const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   const { signIn, isLoading, error, clearError } = useAuthStore();
+  const { width, height } = useWindowDimensions();
   const [debugInfo, setDebugInfo] = React.useState<string>('');
 
   const googleIconImage = require("../assets/GoogleIcon.png");
@@ -62,17 +64,57 @@ const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
     }
   }, [error]);
 
+const isTablet = (width >= 768);
+
+const titleWidth = Math.min(width * 0.85, 650);
+const machineSize = Math.min(width * 0.85, isTablet ? 650 : 360);
+const buttonWidth = Math.min(width * 0.62, 380);
+const buttonHeight = isTablet ? 64 : 58;
+const iconSize = isTablet ? 28 : 24;
+const buttonFontSize = isTablet ? 22 : 18;
+
+
   return (
     <Background>
       <View style={styles.container}>
-        <Image source={clawzerTitle} style={styles.clawTitle}/>
-        <Image source={clawMachine} style={styles.clawMachine}/>
+        <Image source={clawzerTitle} style=
+        {[
+            styles.clawTitle,
+            {
+              width: titleWidth,
+              height: titleWidth * 0.28, // adjust a little if needed
+            },
+        ]}
+          resizeMode="contain"
+        />
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} disabled={isLoading}>
+
+        <Image source={clawMachine} style=
+        {[
+            styles.clawMachine,
+            {
+              width: machineSize,
+              height: machineSize,
+            },
+        ]}
+          resizeMode="contain"
+        />
+
+        <TouchableOpacity style={[styles.googleButton, { width: buttonWidth, height: buttonHeight }]} onPress={handleGoogleSignIn} disabled={isLoading}>
           {isLoading ? (<ActivityIndicator color="#fff" />) : 
             (<View style={styles.googleButtonContainer}>
-              <Image source={googleIconImage} style={styles.googleIcon}/>
-              <Text style={styles.googleButtonText}>Sign in with Google</Text>
+              <Image source={googleIconImage} style=
+              {[
+                  styles.googleIcon,
+                  {
+                    width: iconSize,
+                    height: iconSize,
+                    marginRight: 12,
+                  },
+              ]}
+                resizeMode="contain"
+              />
+              <Text style={[styles.googleButtonText, { fontSize: buttonFontSize }]}>Sign in with Google</Text>
             </View>)
           }
         </TouchableOpacity>
@@ -89,24 +131,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clawTitle: {
-    width: 360,
+    marginTop:30,
   },
   clawMachine: {
-    width: 400,
-    height: 400,
+    marginBottom:28,
   },
   googleButton: {
     backgroundColor: '#222',
     borderColor: '#00E5FF',
     borderRadius: 16,
     borderWidth: 4,
-    width: 360,
-    height: 80,
+    justifyContent: 'center',
     shadowColor: '#000',
   },
   googleButtonText: {
     color: '#fff',
-    fontSize: 26,
     fontWeight: '600',
     paddingLeft: 8,
   },
@@ -114,11 +153,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
-  googleIcon: {
-    width: 80,
-    height: 80,
-  }
+  googleIcon: {},
 });
 
 export default LoginScreen;

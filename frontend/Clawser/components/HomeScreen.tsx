@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     top: -windowHeight * 0.05,
     resizeMode: 'contain',
     zIndex: 3,
+    marginTop:35,
   },
 
   ribbonLeft: {
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
   },
 
   clawImage: {
-    marginTop: "20%",
+    marginTop: "30%",
     width: Math.min(windowWidth * 0.75, 600),
     height: Math.min(windowWidth * 1, 400),
     resizeMode: "contain",
