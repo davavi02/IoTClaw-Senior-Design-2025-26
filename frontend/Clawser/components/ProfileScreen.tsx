@@ -9,26 +9,24 @@ import {
 } from 'react-native';
 import BottomNavBar from '../components/BottomNavBar';
 import ProfileAvatar from '../assets/icons/PFP.png';
-import useUserDataStore from '../stores/UserDataStore';
 import { useAuthStore } from '../stores/AuthStore';
 import { ProfileProps } from './Routes';
 import HeaderBar from './HeaderBar';
 import Background from './Background';
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
-  const { numTokens } = useUserDataStore();
   const { signOut, user } = useAuthStore();
 
   return (
       <Background>
         <HeaderBar useLogoInstead={true}></HeaderBar>
-
         {/* SCROLLABLE CONTENT */}
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.center}>
           {/* PROFILE CARD */}
           <View style={styles.profileCardOutline}>
-            <Image source={ProfileAvatar} style={styles.profileAvatar} />
+            <Image source={user?.picture ? { uri: user.picture } : ProfileAvatar} 
+              style={styles.profileAvatar} />
             <View style={styles.profileText}>
               <Text style={styles.fullName}>{user?.name}</Text>
               <Text style={styles.username}>{user?.email}</Text>
@@ -40,7 +38,7 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
 
             {/* SETTINGS BUTTON */}
             <View style={styles.settingsButtonOutline}>
-              <TouchableOpacity style={styles.settingsButton}>
+              <TouchableOpacity style={styles.settingsButton} disabled>
                 <Text style={styles.settingsButtonText}>Settings</Text>
               </TouchableOpacity>
             </View>
@@ -60,31 +58,24 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
                 <Text style={styles.actionButtonText}>Edit Address</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() => navigation.navigate('ReportError')}
-              >
+              <TouchableOpacity style={styles.actionButton}
+                onPress={() => navigation.navigate('ReportError')}>
                 <Text style={styles.actionButtonText}>Report Error</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() => navigation.navigate('PrizeTracking')}
-              >
+              <TouchableOpacity style={styles.actionButton}
+                onPress={() => navigation.navigate('PrizeTracking')}>
                 <Text style={styles.actionButtonText}>Prize Tracking</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => signOut()}
-              >
+              <TouchableOpacity style={styles.actionButton} onPress={() => signOut()}>
                 <Text style={styles.actionButtonText}>Logout</Text>
               </TouchableOpacity>
             </View>
 
           </View>
+          </View>
         </ScrollView>
-
         {/* FIXED BOTTOM NAVBAR */}
         <BottomNavBar
           active="profile"
@@ -108,10 +99,14 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingVertical: 20,
-    paddingHorizontal: 15,
-    paddingBottom: 100,
   },
+  center: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    flex: 1,
 
+  },
   profileCardOutline: {
     width: 370,
     height: 159,
