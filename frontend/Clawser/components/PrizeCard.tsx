@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#E0E0E0",
     marginTop: 10,
+    paddingHorizontal: 2,
   },
   date: {
     fontSize: 12,

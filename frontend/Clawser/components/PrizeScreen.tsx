@@ -63,7 +63,7 @@ const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
                 <FlatList
                         data={prizes}
                         keyExtractor={(item) => item.dateWon}
-                        renderItem={({ item }) => <PrizeCard prize={item} />}
+                        renderItem={({ item  }) => <PrizeCard prize={item} />}
                         contentContainerStyle={{ marginVertical: 0 }}
                       />
             </View>) : (<Text style={styles.errText}>No prizes won yet!!</Text>)}
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   main: {
     // flex: 1 means "take all remaining space above the navbar"
     flex: 1,
+    alignItems: "center"
     // add padding/margins if you want
   },
 
