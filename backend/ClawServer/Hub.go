@@ -195,7 +195,7 @@ func (h *Hub) handleServerMessage(message *Packet) {
 		if cli != nil {
 			uid, err := cli.jwtData.GetUserIdAsInt64()
 			if err == nil {
-				err = AwardPrize(0, uid, h.server)
+				err = AwardPrize(1, uid, h.server)
 				if err != nil {
 					fmt.Println("Error awarding prize...")
 				}
