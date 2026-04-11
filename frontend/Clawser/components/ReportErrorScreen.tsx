@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { callProtectedRoute } from '../services/ApiService';
 import { ReportErrorProps } from './Routes';
 import HeaderBar from './HeaderBar';
+import EditInputBox from './EditInputBox';
 
 const ReportErrorScreen: React.FC<ReportErrorProps> = ({ navigation }) => {
   const [subject, setSubject] = useState('');
@@ -79,16 +80,9 @@ const ReportErrorScreen: React.FC<ReportErrorProps> = ({ navigation }) => {
             </Text>
 
             <View style={styles.card}>
-              <Text style={styles.label}>Subject (optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={subject}
-                onChangeText={setSubject}
-                placeholder="e.g. Play screen freezes"
-                placeholderTextColor="#6688aa"
-                maxLength={200}
-                editable={!submitting}
-                returnKeyType="next"
+              <EditInputBox label="Subject" value={subject}
+                onChangeFunc={setSubject}
+                placeholder="Your Name" maxLength={200} editable={!submitting}
               />
 
               <Text style={[styles.label, styles.labelSpaced]}>Details</Text>

@@ -1,9 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
@@ -11,34 +10,69 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../stores/AuthStore';
 import { EditProfileProps } from './Routes';
 import HeaderBar from './HeaderBar';
+import { callProtectedRoute } from '../services/ApiService';
+import Address from '../types/AddressData';
 import EditInputBox from './EditInputBox';
 
-const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
+const EditAddressScreen: React.FC<EditProfileProps> = ({ navigation }) => {
+  
   const { user, updateDisplayName } = useAuthStore();
-  const [displayName, setDisplayName] = useState(user?.name ?? '');
+  const [addr, setAddress] = useState<Address | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      setDisplayName(user?.name ?? '');
-    }, [user?.name])
-  );
+  useEffect(() => {
+    const loadAddy = async () => {
+      try {
+        const response = await callProtectedRoute('/api/address', {
+            method: 'GET' 
+          });
+
+          console.log("Server Status Code:", response.status);
+
+        if (response.ok){
+          const data = await response.json();
+          setAddress(data);
+        } else {
+          const errorText = await response.text();
+          console.log("Server Error Text:", errorText);
+        }
+      } catch (error) {
+        console.error("Failed to load address data: ", error);
+      }
+    };
+
+    loadAddy();
+  }, []);
+
+  const updateData = (field : string, value : string) => {
+    setAddress(prev => prev ? { ...prev, [field]: value } : null);
+  };
 
   const onSave = async () => {
     setSaving(true);
-    const result = await updateDisplayName(displayName);
-    setSaving(false);
-    if (!result.ok) {
-      Alert.alert('Could not save', result.error);
-      return;
+    
+    try {
+      const response = await callProtectedRoute(`/api/address`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addr)
+      });
+
+      if (response.ok) {
+        Alert.alert('Saved', 'Your address was updated.', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        Alert.alert('Could not save');
+      }
+    } catch (error) {
+        Alert.alert('Could not save');
+    } finally {
+      setSaving(false);
     }
-    Alert.alert('Saved', 'Your display name was updated.', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
   };
 
   return (
@@ -56,21 +90,32 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.screenTitle}>Edit Profile</Text>
+            <Text style={styles.screenTitle}>Edit Address</Text>
 
-            <View style={styles.card}>
+            <EditInputBox label="Name" value={addr?.name ?? ''}
+              onChangeFunc={(x:string)=>{updateData("name",x);}}
+              placeholder="Your Name" maxLength={120} editable={!saving}
+            />
 
-              <EditInputBox label="Display Name" value={displayName}
-                onChangeFunc={setDisplayName}
-                placeholder="Your Name" maxLength={50} editable={!saving}
-              />
+            <EditInputBox label="Street" value={addr?.street ?? ''}
+              onChangeFunc={(x:string)=>{updateData("street",x);}}
+              placeholder="Your Street" maxLength={120} editable={!saving}
+            />
 
-              <Text style={[styles.label, styles.labelSpaced]}>Email</Text>
-              <View style={styles.readOnlyBox}>
-                <Text style={styles.readOnlyText}>{user?.email ?? '—'}</Text>
-              </View>
-              <Text style={styles.hint}>Email is tied to your Google account and can’t be changed here.</Text>
-            </View>
+            <EditInputBox label="City" value={addr?.city ?? ''}
+              onChangeFunc={(x:string)=>{updateData("city",x);}}
+              placeholder="Your City" maxLength={50} editable={!saving}
+            />
+
+            <EditInputBox label="Zipcode" value={ addr?.zipcode ?? ''}
+              onChangeFunc={(x:string)=>{updateData("zipcode",x);}}
+              placeholder="12345" maxLength={5} editable={!saving}
+            />
+              
+            <EditInputBox label="State" value={addr?.state ?? ''}
+              onChangeFunc={(x:string)=>{updateData("state",x);}}
+              placeholder="TX" maxLength={2} editable={!saving}
+            />
 
             <TouchableOpacity
               style={[styles.saveButton, saving && styles.saveButtonDisabled]}
@@ -126,12 +171,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 20,
   },
-  label: {
-    color: '#AAA',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
   labelSpaced: {
     marginTop: 16,
   },
@@ -184,4 +223,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProfileScreen;
+export default EditAddressScreen;

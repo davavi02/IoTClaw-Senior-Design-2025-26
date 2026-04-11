@@ -7,6 +7,7 @@ import PrizeScreen from './PrizeScreen';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
 import EditProfileScreen from './EditProfileScreen';
+import EditAddressScreen from './EditAddressScreen';
 import ReportErrorScreen from './ReportErrorScreen';
 import PrizeTrackingScreen from './PrizeTrackingScreen';
 import PlayScreen from './PlayScreen';
@@ -29,6 +30,7 @@ type StackParamList = {
   Prize: { from?: string };
   Profile: { from?: string };
   EditProfile: undefined;
+  EditAddress: undefined;
   ReportError: undefined;
   PrizeTracking: undefined;
   Play: { cab: CabinentData };
@@ -144,6 +146,13 @@ const Routes = () => {
         }}
       />
       <Stack.Screen
+        name="EditAddress"
+        component={EditAddressScreen}
+        options={{
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
         name="ReportError"
         component={ReportErrorScreen}
         options={{
@@ -189,6 +198,7 @@ export type CabSelectProps = NativeStackScreenProps<StackParamList, 'CabSelect',
 export type LoginProps = NativeStackScreenProps<StackParamList, 'Login', 'Stack'>;
 export type ProfileProps = NativeStackScreenProps<StackParamList, 'Profile', 'Stack'>;
 export type EditProfileProps = NativeStackScreenProps<StackParamList, 'EditProfile', 'Stack'>;
+export type EditAddressProps = NativeStackScreenProps<StackParamList, 'EditAddress', 'Stack'>;
 export type ReportErrorProps = NativeStackScreenProps<StackParamList, 'ReportError', 'Stack'>;
 export type PrizeTrackingProps = NativeStackScreenProps<StackParamList, 'PrizeTracking', 'Stack'>;
 export type PlayProps = NativeStackScreenProps<StackParamList, 'Play', 'Stack'>;
