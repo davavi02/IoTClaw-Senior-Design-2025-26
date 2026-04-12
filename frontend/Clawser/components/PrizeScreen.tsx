@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
+  Dimensions,
   FlatList, Text
 } from 'react-native';
 import { useAuthStore } from '../stores/AuthStore';
@@ -12,7 +13,7 @@ import PrizeCard from '../components/PrizeCard'
 import Background from './Background';
 import { Prize } from '../types/prize';
 import { callProtectedRoute } from '../services/ApiService';
-
+const height = Dimensions.get("window").height;
 
 const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
   const [prizes, setPrizes] = useState<Prize[]>([]);
@@ -75,6 +76,7 @@ const PrizeScreen: React.FC<PrizeProps> = ({ navigation }) => {
             onPressHome={() => navigation.navigate("Home", { from: "Prize" })}
             onPressMap={() => navigation.navigate("Prize")}
             onPressProfile={() => navigation.navigate("Profile", { from: "Prize" })}
+            height={height * 0.08}
           />
         </View>
     </Background>

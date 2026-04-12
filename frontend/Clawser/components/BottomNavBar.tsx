@@ -10,10 +10,11 @@ import ProfilePageIconLight from "../assets/icons/ProfilePageIconLight.png";
 
 
 type Props = {
-  active: 'map' | 'home' | 'profile';
+  active: 'prize' | 'home' | 'profile';
   onPressMap?: () => void;
   onPressHome?: () => void;
   onPressProfile?: () => void;
+  height: number;
 };
 
 export default function BottomNavBar({
@@ -21,17 +22,17 @@ export default function BottomNavBar({
   onPressMap,
   onPressHome,
   onPressProfile,
+  height,
 }: Props) {
   return (
-    <View style={styles.container}>
-
+    <View style={[styles.container, { height }]}>
       {/* Map */}
       <TouchableOpacity
         style={[styles.item, active === 'prize' && styles.activeItem]}
         onPress={onPressMap}
       >
         <Image
-            style = {styles.icons}
+            style = {[styles.icons, {height: height * 0.8, width: height * 0.8}]}
             source = {active === 'prize' ? PrizePageIconDark : PrizePageIconLight}/>
       </TouchableOpacity>
 
@@ -41,7 +42,7 @@ export default function BottomNavBar({
         onPress={onPressHome}
       >
         <Image
-        style = {styles.icons}
+        style = {[styles.icons, {height: height * 0.8, width: height * 0.8}]}
         source = {active === 'home' ? HomeIconDark : HomeIconLight}/>
       </TouchableOpacity>
 
@@ -51,7 +52,7 @@ export default function BottomNavBar({
         onPress={onPressProfile}
       >
         <Image
-        style = {styles.profileIcon}
+        style = {[styles.icons, {height: height * 0.8, width: height * 0.8}]}
         source = {active === 'profile' ? ProfilePageIconDark : ProfilePageIconLight}/>
       </TouchableOpacity>
 
@@ -63,7 +64,6 @@ const styles = StyleSheet.create({
   container: {
       borderTopWidth: 3,
       borderTopColor: "rgba(0, 229, 255, 0.96)",
-      height: 70,
       flexDirection: 'row',
       backgroundColor: '#050038',       // dark navy background
   },
@@ -79,8 +79,4 @@ const styles = StyleSheet.create({
       width: 55,
       height: 55,
   },
-  profileIcon: {
-      width: 55,
-      height: 55,
-  }
 });

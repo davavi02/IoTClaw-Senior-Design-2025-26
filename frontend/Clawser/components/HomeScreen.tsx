@@ -15,12 +15,13 @@ import ClawzerTitle from '../assets/ClawzerTitle.png';
 import Ribbon from '../assets/Ribbon.png';
 import ClawMachine from '../assets/HomeScreenClaw.png';
 import { ImageBackground } from "react-native";
-import Pxbkg from "../assets/pixbkg.png";
 import PlayButton from "../assets/PlayButton.png";
 import CoinsButton from '../components/CoinsButton';
 import Background from './Background';
-const {width: windowWidth} = Dimensions.get("window");
-const {height: windowHeight} = Dimensions.get("window");
+const {width: width} = Dimensions.get("window");
+const {height: height} = Dimensions.get("window");
+const aspectRatio = width / height;
+const isTablet = aspectRatio >= 0.55;
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { user, signOut } = useAuthStore();
@@ -33,10 +34,6 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             {/* HEADER */}
             <View style={styles.headerWrapper}>
               <View style={styles.topHeader} />
-              <View style = {styles.coinsButton}>
-                  <CoinsButton
-                  onPress = {() => navigation.navigate("Shop")}/>
-              </View>
               <Image source={ClawzerTitle} style={styles.topLogo} />
             </View>
 
@@ -56,8 +53,10 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
                       >
                   <View>
                       <Image source={PlayButton} style={styles.playButtonImage} />
-                      <Text style = {styles.playButtonPlayText}>Play</Text>
-                      <Text style = {styles.playButtonCostText}>10 Tokens</Text>
+                      <View style={styles.playButtonTextWrapper}>
+                        <Text style={styles.playButtonPlayText}>Play</Text>
+                        <Text style={styles.playButtonCostText}>10 Tokens</Text>
+                      </View>
                   </View>
               </TouchableOpacity>
             </View>
@@ -69,6 +68,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
             onPressHome={() => navigation.navigate("Home", {from: "Home"})}
             onPressMap={() => navigation.navigate("Prize", {from: "Home"})}
             onPressProfile={() => navigation.navigate("Profile", {from: "Home"})}
+            height={height * 0.08}
           />
         </View>
 </Background>
@@ -97,44 +97,43 @@ const styles = StyleSheet.create({
   headerWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 40,
+    marginTop: 0,
   },
 
   topHeader: {
-    width: 400,
-    height: 400,
+    width: width,
+    height: width,
     backgroundColor: '#0B0029',
-    borderRadius: 200,
+    borderRadius: width,
     transform: [{ scaleX: 1.5 }],
-    borderWidth: 4,
+    borderWidth: width/100,
     borderColor: 'rgba(0, 229, 255, 0.96)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 7 },
+    shadowOffset: { width: 0, height: width/50 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 7,
     position: 'absolute',
-    top: -300,
+    top: isTablet ? -width * 0.75 : -width * 0.7,
     zIndex: 2,
   },
 
   topLogo: {
-    width: '80%',
-    height: 140,
+    width: isTablet ? '60%' : '80%',
+    height: height * 0.5 * aspectRatio,
     position: 'absolute',
-    top: -windowHeight * 0.05,
     resizeMode: 'contain',
     zIndex: 3,
-    marginTop:35,
+    marginTop: height * 0.2 * aspectRatio,
   },
 
   ribbonLeft: {
     transform: [{ rotate: '-25.4deg' }],
     position: 'absolute',
     resizeMode: "contain",
-    width: "60%",
-    top: 60,
-    left: -30,
+    width: isTablet ? "45%" : "60%",
+    top: isTablet ? height * 0.18 : height * 0.08,
+    left: isTablet ? -width * 0.05 : -width * 0.1,
     zIndex: 1,
   },
 
@@ -142,9 +141,9 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '25.4deg' }],
     position: 'absolute',
     resizeMode: "contain",
-    width: "60%",
-    top: 60,
-    right: -30,
+    width: isTablet ? "45%" : "60%",
+    top: isTablet ? height * 0.18 : height * 0.08,
+    right: isTablet ? -width * 0.05 : -width * 0.1,
     zIndex: 1,
   },
 
@@ -152,20 +151,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",  // push claw to the bottom of main
     alignItems: "center",        // center horizontally
-    paddingTop: 50,            // space above navbar
+    paddingTop: 0,            // space above navbar
   },
 
   clawImage: {
-    marginTop: "30%",
-    width: Math.min(windowWidth * 0.75, 600),
-    height: Math.min(windowWidth * 1, 400),
+    marginTop: height * 0.25 * aspectRatio**0.2,
+    width: isTablet ? width * 0.5 : width * 0.7,
+    height: isTablet ? width * 0.5 * (350/300) : width * 0.7 * (350/300),
     resizeMode: "contain",
   },
 
   playButtonWrapper: {
     justifyContent: "flex-end",  // push claw to the bottom of main
     alignItems: "center",        // center horizontally
-    paddingBottom: 10,            // space above navbar
+    paddingBottom: height * 0.02,            // space above navbar
   },
 
   // this hold the actual button so the touchable opacity can work 
@@ -176,33 +175,32 @@ const styles = StyleSheet.create({
   },
 
   playButtonImage: {
+    width: isTablet ? width * 0.3 : width * 0.4,
+    height: isTablet ? width * 0.3 * 133/163: width * 0.4 * 133/163,
     transform: [{scaleX: 1.2}],
   },
 
   playButtonPlayText: {
-    position: 'absolute',
     color: "#fff",
-    fontSize: 60,
+    fontSize: isTablet ? width * 0.11 : width * 0.14,
     fontWeight: "bold",
-    top: 10,
-    left: 25,
     zIndex: 4
-  },
-
-  coinsButton: {
-    position: 'absolute',
-    top: -80,
-    right: 20
   },
 
   playButtonCostText: {
-    position: 'absolute',
     color: "#fff",
-    fontSize: 20,
+    fontSize: isTablet ? width * 0.03 : width * 0.04,
     fontWeight: "bold",
-    top: 80,
-    left: 35,
     zIndex: 4
+  },
+
+  playButtonTextWrapper: {
+    width: isTablet ? width * 0.3 : width * 0.4,
+    height: isTablet ? width * 0.3 * 133/163: width * 0.4 * 133/163,
+    position: 'absolute',
+    top: 0,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }
 );

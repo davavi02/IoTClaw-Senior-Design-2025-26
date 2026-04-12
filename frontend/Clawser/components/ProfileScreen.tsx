@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  Dimensions,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -13,6 +14,7 @@ import { useAuthStore } from '../stores/AuthStore';
 import { ProfileProps } from './Routes';
 import HeaderBar from './HeaderBar';
 import Background from './Background';
+const height = Dimensions.get("window").height;
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
   const { signOut, user } = useAuthStore();
@@ -82,6 +84,7 @@ const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
           onPressHome={() => navigation.navigate('Home', { from: 'Profile' })}
           onPressMap={() => navigation.navigate('Prize', { from: 'Profile' })}
           onPressProfile={() => navigation.navigate('Profile', { from: 'Profile' })}
+          height={height * 0.08}
         />
       </Background>
   );
