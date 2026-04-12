@@ -7,21 +7,22 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Dimensions,
   useWindowDimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../stores/AuthStore';
 import { LoginProps } from './Routes';
 import Background from './Background';
+const { width, height } = Dimensions.get("window");
 
 const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
   const { signIn, isLoading, error, clearError } = useAuthStore();
-  const { width, height } = useWindowDimensions();
   const [debugInfo, setDebugInfo] = React.useState<string>('');
 
   const googleIconImage = require("../assets/GoogleIcon.png");
   const clawzerTitle = require("../assets/ClawzerTitle.png");
-  const clawMachine = require("../assets/ClawMachine.png");
+  const clawMachine = require("../assets/HomeScreenClaw.png");
 
   /*React.useEffect(() => {
     // Log debug info on mount
@@ -66,12 +67,12 @@ const LoginScreen: React.FC = ({route, navigation}: LoginProps) => {
 
 const isTablet = (width >= 768);
 
-const titleWidth = Math.min(width * 0.85, 650);
-const machineSize = Math.min(width * 0.85, isTablet ? 650 : 360);
-const buttonWidth = Math.min(width * 0.62, 380);
-const buttonHeight = isTablet ? 64 : 58;
-const iconSize = isTablet ? 28 : 24;
-const buttonFontSize = isTablet ? 22 : 18;
+const titleWidth = Math.min(width * 0.85, 850);
+const machineSize = Math.min(width * 0.55, isTablet ? 650 : 360);
+const buttonWidth = isTablet ? Math.min(width * 0.6, 700) : width * 0.8;
+const buttonHeight = height * 0.08;
+const iconSize = buttonHeight * 0.7;
+const buttonFontSize = buttonHeight * 0.38;
 
 
   return (
@@ -131,10 +132,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clawTitle: {
-    marginTop:30,
+    marginBottom: height * 0.03,
   },
   clawMachine: {
-    marginBottom:28,
+    marginBottom: height * 0.06,
   },
   googleButton: {
     backgroundColor: '#222',
