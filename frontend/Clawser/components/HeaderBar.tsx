@@ -17,6 +17,8 @@ interface HeaderBarProps {
 const HeaderBar: React.FC<HeaderBarProps> = ({ useLogoInstead, height }) => {
   const navigation = useNavigation();
   const headerHeight = height || 91; // Default to 91 if height is not provided
+  const backButtonHeight = headerHeight * 0.5;
+  const backButtonWidth = backButtonHeight * 2;
   return (
     <View style={styles.headerWrapper}>
       <View style={[styles.headerOutline, { height: headerHeight }]}>
@@ -31,7 +33,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ useLogoInstead, height }) => {
             />
           </Svg>)}
 
-         <CoinsButton onPress={() => navigation.navigate('Shop')}/>
+         <CoinsButton onPress={() => navigation.navigate('Shop')} height={headerHeight * 0.6}/>
       </View>
     </View>
   );
@@ -46,18 +48,16 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 3,
     borderBottomColor: '#FF2F00',
-    borderRadius: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    marginTop: 0,
+    paddingHorizontal: windowWidth * 0.025,
     backgroundColor: '#0B0029',
   },
 
   topLogo: {
     width: "50%",
-    height: "80%",
+    height: "60%",
     resizeMode: 'contain',
   },
 

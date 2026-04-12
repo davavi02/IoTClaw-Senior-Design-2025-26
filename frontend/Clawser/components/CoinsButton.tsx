@@ -6,22 +6,24 @@ import useUserDataStore from '../stores/UserDataStore';
 
 type Props = {
   onPress?: () => void;
+  height?: number;
 };
 
 
-export default function CoinsButton({onPress }: Props) {
+export default function CoinsButton({onPress, height}: Props) {
+  height = height || 40;
 
   const {numTokens} = useUserDataStore();
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={[styles.container, {height}]} onPress={onPress}>
       <View style={styles.row}>
-        <Image source={coinIcon} style={styles.coin} />
-        <Text style={styles.amount}>{numTokens}</Text>
+        <Image source={coinIcon} style={[styles.coin, {height: height, width: height * 0.5}]} />
+        <Text style={[styles.amount, {fontSize: height * 0.45}]}>{numTokens}</Text>
 
         {/* Spacer that forces + to right */}
         <View style={{ flex: 1 }} />
 
-        <Ionicons name="add-circle-outline" size={25} color="#fff" />
+        <Ionicons name="add-circle-outline" size={height * 0.6} color="#fff" />
       </View>
     </TouchableOpacity>
   );
@@ -29,7 +31,6 @@ export default function CoinsButton({onPress }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    height: 40,
     paddingHorizontal: 10,
     backgroundColor: '#0B0029',
     borderWidth: 2,
@@ -43,15 +44,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   coin: {
-    width: 20,
-    height: 20,
     resizeMode: 'contain',
     marginRight: 1, // ***THIS MAKES IT TIGHT LIKE YOUR IMAGE***
   },
   amount: {
     color: 'white',
-    fontSize: 24,
     fontWeight: 'bold',
-    marginRight: 30, // keeps the number tight before spacing
+    marginRight: 15, // keeps the number tight before spacing
   },
 });

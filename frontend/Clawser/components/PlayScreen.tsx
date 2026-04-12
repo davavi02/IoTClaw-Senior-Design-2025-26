@@ -50,9 +50,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   return (
     <Background>
       <View style={styles.container}>
-        <View style={styles.headerOverlay}>
-          <HeaderBar />
-        </View>
+        <HeaderBar height={height * 0.08} />
 
         <View style={styles.mainArea}>
           <View style={styles.machineArea}>

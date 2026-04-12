@@ -15,13 +15,14 @@ import { ProfileProps } from './Routes';
 import HeaderBar from './HeaderBar';
 import Background from './Background';
 const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
 
 const ProfileScreen: React.FC<ProfileProps> = ({ navigation }) => {
   const { signOut, user } = useAuthStore();
 
   return (
       <Background>
-        <HeaderBar useLogoInstead={true}></HeaderBar>
+        <HeaderBar useLogoInstead={true} height={height * 0.08}></HeaderBar>
         {/* SCROLLABLE CONTENT */}
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.center}>
@@ -111,14 +112,15 @@ const styles = StyleSheet.create({
 
   },
   profileCardOutline: {
-    width: 370,
-    height: 159,
+    width: width * 0.92,
+    height: 160,
     borderWidth: 4,
     borderColor: '#FF2F00',
     borderRadius: 4,
     backgroundColor: '#001F3F',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     padding: 15,
     marginBottom: 20,
   },
@@ -149,7 +151,7 @@ const styles = StyleSheet.create({
   },
 
   actionSectionOutline: {
-    width: 370,
+    width: width * 0.92,
     height: 475,
     borderWidth: 3,
     borderColor: '#FF2F00',

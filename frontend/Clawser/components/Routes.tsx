@@ -170,7 +170,7 @@ const Routes = () => {
         name='Prize'
         component={PrizeScreen}
         options={({ route }) => ({
-          animation: route.params?.from === 'Home' ? 'slide_from_left' : 'default',
+          animation: "slide_from_left"
         })}
       />
       <Stack.Screen

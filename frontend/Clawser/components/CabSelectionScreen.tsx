@@ -10,10 +10,12 @@ import {
   View,
   Text,
   StyleSheet,
+  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import { callProtectedRoute } from '../services/ApiService';
 import HeaderBar from './HeaderBar';
+const height = Dimensions.get("window").height;
 
 const MOCK_CABINETS: CabinentData[] = 
   [
@@ -92,9 +94,9 @@ const CabSelectionScreen = ({route, navigation}: CabSelectProps) => {
   
   return (
     <Background>
-      
-      <HeaderBar></HeaderBar>
-      
+
+      <HeaderBar height={height * 0.08} />
+
       <View style={[styles.shopContainer, { flexWrap: 'wrap', justifyContent: 'center' }]}>
         
         { (isLoading || isError || emptyCabData) &&
