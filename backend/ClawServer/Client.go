@@ -89,9 +89,9 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-
+		if packetType == websocket.TextMessage {
+			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+		}
 		packet := CreatePacket(message, c, packetType)
 		fmt.Println("Message recieved: ", packet.Data)
 		c.hub.broadcast <- packet
