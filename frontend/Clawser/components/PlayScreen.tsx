@@ -4,26 +4,37 @@ import {
   Text,
   Image,
   StyleSheet,
-  Dimensions,
-  TouchableOpacity
+  useWindowDimensions,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
-import Background from "./Background";
 import HeaderBar from "./HeaderBar";
 import useWebsocketStore from "../stores/WebsocketStore";
 import arcadeMachine from "../assets/ArcadeBackground.png";
 import SwitchCameraButton from "./SwitchCameraButton";
 import { OutgoingMessages } from "../types/OutgoingMessages";
 import ArcadeControllerView from "./ArcadeControllerView";
-import useUserDataStore from "../stores/UserDataStore";
 import JoinQueueView from "./JoinQueueView";
 import WaitingInQueueView from "./WaitingInQueueView";
-
-const { width, height } = Dimensions.get("window");
-const heightAfterHeader = height - (91 + 98); // Subtract header height for layout calculations
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
+  var { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  console.log("Hello: Safe area insets:", insets.top);
+  width = width - insets.left - insets.right;
+  height = height - insets.top - insets.bottom;
+  const aspectRatio = width / height;
+  const heightAfterHeader = height * 0.92; // Subtract header height for layout calculations
+  const streamFrameHeight = heightAfterHeader * 0.58;
+  const streamFrameWidth = width * (11 / 15);
+  const streamFrameTop = heightAfterHeader * 0.098;
+  const controlsWidth = width * 0.9;
+  const controlsBottom = 0;
+  const heightOfControls = (heightAfterHeader - streamFrameTop - streamFrameHeight);
+  const controlsHeight = heightOfControls * 1;
+  const controllerWidth = heightOfControls * aspectRatio ** 0.4 * 1.1;
+
   const { cab } = route.params;
   const STREAM_URL = "http://video-server.babid.net:8889/" + cab.name;
   const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab.name;
@@ -35,7 +46,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const lastMessage = useWebsocketStore((state) => state.lastMessage);
   const lastError = useWebsocketStore((state) => state.lastError);
   const notificationMessage = useWebsocketStore((state) => state.notificationMessage);
-  const queuePos = useWebsocketStore((state) => state.queuePosition);
+  const queuePos = 0; //useWebsocketStore((state) => state.queuePosition);
   const send = useWebsocketStore((state) => state.sendCommand);
 
   useEffect(() => {
@@ -48,15 +59,26 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   }, [WS_URL, connect, disconnect]);
 
   return (
-    <Background>
+    <View style= {styles.bkg}>
       <View style={styles.container}>
-        <HeaderBar height={height * 0.08} />
+        <View style={{ borderWidth: 0, borderBottomColor: 'rgba(0, 229, 255, 0.96)' , opacity: 0.5 }}>
+          <HeaderBar height={height * 0.08} />
+        </View>
 
         <View style={styles.mainArea}>
           <View style={styles.machineArea}>
             {/* Bottom layer: stream */}
             <View style={styles.streamWrap}>
-              <View style={styles.streamFrame}>
+              <View
+                style={[
+                  styles.streamFrame,
+                  {
+                    height: streamFrameHeight,
+                    width: streamFrameWidth,
+                    top: streamFrameTop,
+                  },
+                ]}
+              >
                 <WebView
                   source={{ uri: STREAM_URL }}
                   style={styles.webview}
@@ -76,20 +98,46 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
             {/* Middle layer: arcade background */}
             <View style={styles.arcadeOverlay}>
-              <Image source={arcadeMachine} style={styles.arcadeImage} />
+              <Image
+                source={arcadeMachine}
+                style={[
+                  styles.arcadeImage,
+                  {
+                    height: heightAfterHeader,
+                    width,
+                  },
+                ]}
+              />
             </View>
 
             {/* Top layer: controls */}
-            <View style={styles.controlsContainer}>
+            <View
+              style={[
+                styles.controlsContainer,
+                {
+                  bottom: controlsBottom,
+                  height: heightOfControls,
+                  width,
+                },
+              ]}
+            >
 
                 <View style={styles.switchCameraWrap}>
                   { ((queuePos !== null) && (queuePos <= 1)) &&
                     <SwitchCameraButton onPress={()=>{send(OutgoingMessages.ChangeCamera)}} size={width*0.22}/>}
                 </View>
-                
-                <View style={styles.controlsOverlay}>
+
+                <View
+                  style={[
+                    styles.controlsOverlay,
+                    {
+                      height: controlsHeight,
+                      width: controlsWidth,
+                    },
+                  ]}
+                >
                     { (queuePos === null) ? (<JoinQueueView cabCost={cab.cost}/>)
-                        : (queuePos <= 1) ? (<ArcadeControllerView width={width}/>) : (<WaitingInQueueView/>)
+                        : (queuePos <= 1) ? (<ArcadeControllerView width={controllerWidth}/>) : (<WaitingInQueueView/>)
                     }
                 </View>
 
@@ -107,13 +155,19 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
           </View> */}
         </View>
       </View>
-    </Background>
+    </View>
   );
 };
 
 export default PlayScreen;
 
 const styles = StyleSheet.create({
+  bkg: {
+    backgroundColor: '#0B0027',
+    resizeMode: "stretch",
+    height: "100%",
+    width:"100%",
+  },
   container: {
     flex: 1,
   },
@@ -138,10 +192,7 @@ const styles = StyleSheet.create({
   },
 
   streamFrame: {
-    height: heightAfterHeader*.58,
-    width: width * (11/15),
     // aspectRatio: 44/60,
-    top: heightAfterHeader * .098,
     marginLeft: 3.5,
     borderRadius: 12,
     overflow: "hidden",
@@ -158,47 +209,39 @@ const styles = StyleSheet.create({
   
   arcadeOverlay: {
     position: "absolute",
-    left: 0, right: 0, top: 0, bottom: 0,
+    borderWidth: 0,
+    borderColor: "rgba(0, 229, 255, 0.96)",
     alignItems: "center",
     zIndex: 5,
   },
 
   arcadeImage: {
-    height: heightAfterHeader,
-    width: width,
     resizeMode: "stretch",
   },
 
   controlsContainer: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    top: height * 0.55,
-    bottom: 0,
-    //width: width,
     zIndex: 10,
     //flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
     //paddingHorizontal: 24,
-    paddingBottom: "4%",
+    paddingBottom: "0%",
   },
 
   controlsOverlay: {
     //flex: 1,
-    height: height * .25,
-    width: height * 0.42,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: "80%",
   },
 
   switchCameraWrap: {
-    flex: 1,
+    width: "100%",
     justifyContent: "center",
     alignItems: "flex-end",
-    paddingRight: "10%",
-    marginBottom: "13%",
+    paddingRight: "15%",
+    paddingBottom: "2%",
+
   },
 
   statusWrap: {

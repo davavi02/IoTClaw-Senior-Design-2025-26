@@ -18,11 +18,11 @@ const ArcadeControllerView: React.FC<ArcadeControlProps> = ({width}) => {
   return (
   <View style={styles.cont}>
     <View style={styles.dropButtonWrap}>
-      <DropClawButton size={width*0.3} />
+      <DropClawButton size={width*0.7} />
     </View>
 
     <View style={styles.directionalButtonsWrap}>
-      <PlayDirectionalButtons/>
+      <PlayDirectionalButtons size = {width*0.8}/>
     </View>
   </View>)
 };
@@ -34,19 +34,19 @@ const styles = StyleSheet.create({
   cont: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
   },
 
   directionalButtonsWrap: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 0,
   },
 
   dropButtonWrap: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 0,
   },
 });
