@@ -21,7 +21,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   var { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  console.log("Hello: Safe area insets:", insets.top);
   width = width - insets.left - insets.right;
   height = height - insets.top - insets.bottom;
   const aspectRatio = width / height;
