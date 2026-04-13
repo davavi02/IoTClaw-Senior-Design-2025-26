@@ -156,14 +156,6 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
                   >
                     Play
                   </Text>
-                  <Text
-                    style={[
-                      styles.playButtonCostText,
-                      { fontSize: costTextFontSize },
-                    ]}
-                  >
-                    10 Tokens
-                  </Text>
                 </View>
               </View>
             </TouchableOpacity>

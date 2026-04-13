@@ -68,7 +68,7 @@ func (h *Hub) RemoveFromQueue(cli *Client) (isNull bool) {
 			//Update position numbers:
 			for x := 0; x < len(q.JWTClientQueue); x += 1 {
 				cli := q.QueueMap[q.JWTClientQueue[x]]
-				h.outboundMessage <- NewPacketUInt8(uint8(x), cli)
+				h.outboundMessage <- NewPacketUInt8(uint8(x+1), cli)
 			}
 		}
 		h.qDCTimer.Stop()

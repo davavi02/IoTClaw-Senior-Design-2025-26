@@ -15,6 +15,7 @@ interface SocketStore {
     queuePosition: number | null;
     notificationMessage: number | null;
 
+    clearNotif: () => void;
     connectToServer: (URL: string) => Promise<void>;
     disconnect: (code?: number, reason?: string) => void;
 
@@ -33,6 +34,10 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
   lastError: null,
   queuePosition: null,
   notificationMessage: null,
+
+  clearNotif: () => {
+    get().notificationMessage = null;
+  },
    
   connectToServer: async (URL: string) => {
     const { webSocket, isConnected } = get();

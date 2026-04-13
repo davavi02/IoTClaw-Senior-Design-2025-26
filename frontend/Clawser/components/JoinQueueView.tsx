@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 50,
     flexDirection: "column",
-    justifyContent: "space-between",
     alignItems: "center",
   },
   playbtn: {

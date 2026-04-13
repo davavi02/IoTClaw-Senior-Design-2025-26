@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   useWindowDimensions,
+  Alert,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { PlayProps } from "./Routes";
@@ -17,6 +18,7 @@ import ArcadeControllerView from "./ArcadeControllerView";
 import JoinQueueView from "./JoinQueueView";
 import WaitingInQueueView from "./WaitingInQueueView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IncomingMessages } from "../types/IncomingMessage";
 
 const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   var { width, height } = useWindowDimensions();
@@ -47,6 +49,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const notificationMessage = useWebsocketStore((state) => state.notificationMessage);
   const queuePos = useWebsocketStore((state) => state.queuePosition);
   const send = useWebsocketStore((state) => state.sendCommand);
+  const clearNotif = useWebsocketStore((state) => state.clearNotif);
 
   useEffect(() => {
     connect(WS_URL);
@@ -56,6 +59,34 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
       disconnect();
     };
   }, [WS_URL, connect, disconnect]);
+
+  useEffect(() => {
+    if (notificationMessage === null) { return; }
+    switch (notificationMessage)
+    {
+      case IncomingMessages.Win:
+        Alert.alert('Win!', 'You won! Congratulations.', [{ text: 'OK'},]);
+        break;
+      case IncomingMessages.Loss:
+        Alert.alert('Lose', 'You lost! Better luck next time!', [{ text: 'OK' },]);
+        break;
+      case IncomingMessages.WaitEnd:
+        break;
+      case IncomingMessages.InsufficentTokens:
+        Alert.alert('Insufficent Funds', 'Buy some more tokens at the token shop!', [{ text: 'OK' },]);
+        break;
+      case IncomingMessages.CabinentDC:
+        Alert.alert('Error', 'The cabinent has disconnected! Room timeout started.', [{ text: 'OK' },]);
+        break;
+      case IncomingMessages.RoomTimeout:
+        Alert.alert('Error', 'Room timedout without the cabinent has happened.', [{ text: 'OK', onPress: () => navigation.goBack() },]);
+        break;
+      default:
+        Alert.alert('Error', 'A error has happened.', [{ text: 'OK', onPress: () => navigation.goBack() },]);
+        break;
+    }
+    clearNotif();
+  }, [notificationMessage]);
 
   return (
     <View style= {styles.bkg}>
