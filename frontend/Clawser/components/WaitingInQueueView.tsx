@@ -9,18 +9,18 @@ type WaitingInQueueViewProps = {
 const WaitingInQueueView: React.FC<WaitingInQueueViewProps> = ({}) => {
   const send = useWebsocketStore((state) => state.sendCommand);
   const queuePos = useWebsocketStore((state) => state.queuePosition);
+  const leaveQ = useWebsocketStore((state) => state.leaveQueue);
 
   return (
   <View style={styles.cont}>
     <Text style={styles.btnText}>Your position in queue is: {queuePos-1}.</Text>
-    <TouchableOpacity style={styles.playbtn} onPressOut={()=>{send(OutgoingMessages.LeaveQueue)}}>
+    <TouchableOpacity style={styles.playbtn} onPressOut={()=>{send(OutgoingMessages.LeaveQueue); leaveQ();}}>
       <Text style={styles.btnText}>Leave Queue</Text>
     </TouchableOpacity>
   </View>)
 };
 
 export default WaitingInQueueView;
-
 
 const styles = StyleSheet.create({
   cont: {
