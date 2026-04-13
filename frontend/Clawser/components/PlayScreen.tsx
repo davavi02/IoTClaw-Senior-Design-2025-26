@@ -35,7 +35,7 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
   const controllerWidth = heightOfControls * aspectRatio ** 0.4 * 1.1;
 
   const { cab } = route.params;
-  const STREAM_URL = "http://34.174.255.99:8889/" + cab.name;
+  const STREAM_URL = "http://video-server.babid.net:8889/" + cab.name;
   const WS_URL = "ws://34.174.243.193:20206/api/join/" + cab.name;
 
   const connect = useWebsocketStore((state) => state.connectToServer);
