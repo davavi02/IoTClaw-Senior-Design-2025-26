@@ -169,7 +169,8 @@ const useWebsocketStore = create<SocketStore>()((set, get) => ({
     }
 
     if (message instanceof Uint8Array) {
-      webSocket.send(message.buffer);
+      console.log('Sending bytes:', Array.from(message));
+      webSocket.send(message);
       console.log('Binary message sent (Uint8Array):', message.byteLength, 'bytes');
       return;
     }

@@ -28,10 +28,9 @@ const DropClawButton: React.FC<DropClawButtonProps> = ({
 
   return (
     <Pressable
-      onPress={()=>{send(OutgoingMessages.DropClaw)}}
       disabled={disabled}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
+      onPressIn={() => {send(OutgoingMessages.DropClaw); setPressed(true);}}
+      onPressOut={() => {send(OutgoingMessages.DropClawRelease); setPressed(false);}}
       style={[
         styles.button,
         {
