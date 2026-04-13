@@ -41,12 +41,12 @@ const PlayScreen: React.FC<PlayProps> = ({ navigation, route }) => {
 
   const connect = useWebsocketStore((state) => state.connectToServer);
   const disconnect = useWebsocketStore((state) => state.disconnect);
-  //const sendBytes = useWebsocketStore((state) => state.sendBytes);
+  const sendBytes = useWebsocketStore((state) => state.sendBytes);
   const isConnected = useWebsocketStore((state) => state.isConnected);
   const lastMessage = useWebsocketStore((state) => state.lastMessage);
   const lastError = useWebsocketStore((state) => state.lastError);
   const notificationMessage = useWebsocketStore((state) => state.notificationMessage);
-  const queuePos = 0; //useWebsocketStore((state) => state.queuePosition);
+  const queuePos = useWebsocketStore((state) => state.queuePosition);
   const send = useWebsocketStore((state) => state.sendCommand);
 
   useEffect(() => {
